@@ -2,8 +2,8 @@ name: Keep Render Services Awake
 
 on:
   schedule:
-    # Runs every 10 minutes to prevent Render free-tier instances from sleeping (sleep threshold is 15 mins)
-    - cron: '*/10 * * * *'
+    # Runs every 5 minutes to keep Render services hot and awake
+    - cron: '*/5 * * * *'
   workflow_dispatch: # Allows manual one-click trigger from GitHub Actions tab
 
 jobs:
