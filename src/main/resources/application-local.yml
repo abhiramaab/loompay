@@ -1,0 +1,13 @@
+# Local profile: runs without Redis.
+#
+# Locks and rate limits fall back to an in-process store (see
+# InMemoryKeyValueStore). This is convenient for UI development and is
+# NOT safe for multi-instance or production use.
+#
+# Run with:  ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration

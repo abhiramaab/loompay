@@ -53,30 +53,57 @@ State changes are strictly validated; invalid transitions (such as moving from `
 
 ### 1. Create Payment
 - **Method**: `POST`
-- **Path**: `/api/payments`
-- **Header**: `Idempotency-Key: <unique-string>`
+- **Path**: `/api/v1/payments`
+- **Header**: `X-Merchant-Id: <merchant-id>` (used for rate limiting; defaults to `default_merchant`)
 - **Request Body**:
 ```json
 {
   "merchantId": "merchant_123",
-  "amount": 1500.00,
+  "amount": 150000,
   "currency": "INR",
-  "paymentMethod": "UPI"
+  "idempotencyKey": "idem_9f2c1a7b3d4e5f60"
 }
 ```
-- **Response**: `200 OK` with order details and current status.
+- **Response**: `201 Created` with order details and current status.
 
-### 2. Payment Webhook
-- **Method**: `POST`
-- **Path**: `/api/webhooks/payment`
-- **Request Body**:
-```json
-{
-  "orderId": "ord_98765",
-  "status": "SUCCESS",
-  "gatewayReference": "pay_xyz"
-}
+> `amount` is in minor units (paise/cents). `currency` is one of `INR`, `USD`, `EUR`.
+
+### 2. Get Payment
+- **Method**: `GET`
+- **Path**: `/api/v1/payments/{orderId}`
+- **Response**: `200 OK` with order details, or `404` for an unknown order.
+
+Rate limiting allows **5 requests per 10 seconds per merchant**. Excess
+requests receive `429 Too Many Requests` with a `Retry-After` header.
+
+---
+
+## Console (Frontend)
+
+An operator console lives in [`frontend/`](frontend/README.md). It provides an
+overview dashboard, payment creation and lookup, a projection of the
+double-entry ledger, and an API reference.
+
+```bash
+# Terminal 1 — backend without Redis (in-process locks/rate limits):
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+
+# Terminal 2 — console:
+cd frontend && npm install && npm run dev
+# http://localhost:5173
 ```
+
+For the production stack use Docker and the default profile:
+
+```bash
+docker compose up -d   # Postgres + Redis
+./mvnw spring-boot:run
+```
+
+The `local` profile replaces Redis with an in-process store so the backend runs
+without infrastructure. It is not distributed and is intended for development
+only. See `frontend/README.md` for the list of read endpoints the console would
+use once available.
 
 ---
 
