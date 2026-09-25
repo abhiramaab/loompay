@@ -1,14 +1,18 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
+import type { ReactNode } from 'react'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AppShell } from '@/components/AppShell'
 import { ToastProvider } from '@/hooks/useToasts'
+import { AuthProvider, useAuth } from '@/hooks/useAuth'
+import { Home } from '@/pages/Home'
+import { Login } from '@/pages/Login'
 import { Dashboard } from '@/pages/Dashboard'
 import { Payments } from '@/pages/Payments'
 import { PaymentDetail } from '@/pages/PaymentDetail'
 import { Ledger } from '@/pages/Ledger'
 import { Developer } from '@/pages/Developer'
 
-function Page({ children }: { children: React.ReactNode }) {
+function Page({ children }: { children: ReactNode }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -21,57 +25,56 @@ function Page({ children }: { children: React.ReactNode }) {
   )
 }
 
+function Protected({ children }: { children: ReactNode }) {
+  const { isAuthenticated } = useAuth()
+  const location = useLocation()
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />
+  }
+  return <AppShell>{children}</AppShell>
+}
+
+function protectedPage(element: ReactNode) {
+  return (
+    <Protected>
+      <Page>{element}</Page>
+    </Protected>
+  )
+}
+
 export default function App() {
   const location = useLocation()
 
   return (
-    <ToastProvider>
-      <AppShell>
+    <AuthProvider>
+      <ToastProvider>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route
               path="/"
               element={
                 <Page>
-                  <Dashboard />
+                  <Home />
                 </Page>
               }
             />
             <Route
-              path="/payments"
+              path="/login"
               element={
                 <Page>
-                  <Payments />
+                  <Login />
                 </Page>
               }
             />
-            <Route
-              path="/payments/:orderId"
-              element={
-                <Page>
-                  <PaymentDetail />
-                </Page>
-              }
-            />
-            <Route
-              path="/ledger"
-              element={
-                <Page>
-                  <Ledger />
-                </Page>
-              }
-            />
-            <Route
-              path="/developer"
-              element={
-                <Page>
-                  <Developer />
-                </Page>
-              }
-            />
+            <Route path="/dashboard" element={protectedPage(<Dashboard />)} />
+            <Route path="/payments" element={protectedPage(<Payments />)} />
+            <Route path="/payments/:orderId" element={protectedPage(<PaymentDetail />)} />
+            <Route path="/ledger" element={protectedPage(<Ledger />)} />
+            <Route path="/developer" element={protectedPage(<Developer />)} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AnimatePresence>
-      </AppShell>
-    </ToastProvider>
+      </ToastProvider>
+    </AuthProvider>
   )
 }
