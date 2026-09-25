@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # 1. Production PostgreSQL Database for ACID Ledger & Payments
+  postgres:
+    image: postgres:16-alpine
+    container_name: loompay-postgres
+    environment:
+      POSTGRES_DB: loompay_db
+      POSTGRES_USER: loompay
+      POSTGRES_PASSWORD: loompay_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U loompay -d loompay_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Redis for Distributed Mutex Locks & Rate Limiting
+  redis:
+    image: redis:7-alpine
+    container_name: loompay-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

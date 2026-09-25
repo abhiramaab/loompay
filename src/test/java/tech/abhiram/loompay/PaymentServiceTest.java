@@ -13,6 +13,7 @@ import tech.abhiram.loompay.dto.PaymentResponse;
 import tech.abhiram.loompay.entity.PaymentOrder;
 import tech.abhiram.loompay.enums.Currency;
 import tech.abhiram.loompay.enums.PaymentStatus;
+import tech.abhiram.loompay.repository.OutboxEventRepository;
 import tech.abhiram.loompay.repository.PaymentOrderRepository;
 import tech.abhiram.loompay.service.DistributedLockService;
 import tech.abhiram.loompay.service.IdempotencyService;
@@ -37,6 +38,9 @@ public class PaymentServiceTest {
 
     @Mock
     private DistributedLockService distributedLockService;
+
+    @Mock
+    private OutboxEventRepository outboxEventRepository;
 
     @InjectMocks
     private PaymentService paymentService;
