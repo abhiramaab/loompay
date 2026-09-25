@@ -34,28 +34,28 @@
 ---
 
 <details>
-<summary><strong>📁 Table of Contents</strong></summary>
+<summary><strong>Table of Contents</strong></summary>
 
-- [What Can I Do with LoomPay?](#-what-can-i-do-with-loompay)
-- [System Design & Core Modules](#-system-design--core-modules)
-  - [1. Concurrency: Redis Distributed Mutex](#1-concurrency-redis-distributed-mutex-lock)
+- [Overview](#overview)
+- [System Design & Core Modules](#system-design--core-modules)
+  - [1. Concurrency: Redis Distributed Mutex Lock](#1-concurrency-redis-distributed-mutex-lock)
   - [2. Idempotency: Double-Checked Locking](#2-idempotency-double-checked-locking)
   - [3. Messaging: Transactional Outbox Pattern](#3-messaging-transactional-outbox-pattern)
-  - [4. Sharding: Consistent Hashing 360° Ring](#4-sharding-consistent-hashing-360-ring-router)
+  - [4. Sharding: Consistent Hashing 360° Ring Router](#4-sharding-consistent-hashing-360-ring-router)
   - [5. Integrity: Double-Entry Bookkeeping Ledger](#5-integrity-double-entry-bookkeeping-ledger)
   - [6. Traffic: Token-Bucket Rate Limiter](#6-traffic-token-bucket-rate-limiter)
   - [7. Recovery: Automated Reconciliation Engine](#7-recovery-automated-reconciliation-engine)
-- [Architecture & Transaction Lifecycle](#-architecture--transaction-lifecycle)
-- [Quickstart (Local Docker Setup)](#-quickstart-local-docker-setup)
-- [API Reference & Usage](#-api-reference--usage)
-- [Operator Console (Frontend)](#-operator-console-frontend)
-- [Verification & Test Suite](#-verification--test-suite)
+- [Architecture & Transaction Lifecycle](#architecture--transaction-lifecycle)
+- [Quickstart (Local Docker Setup)](#quickstart-local-docker-setup)
+- [API Reference & Usage](#api-reference--usage)
+- [Operator Console (Frontend)](#operator-console-frontend)
+- [Verification & Test Suite](#verification--test-suite)
 
 </details>
 
 ---
 
-## ⚡ What Can I Do with LoomPay?
+## Overview
 
 LoomPay is an open architecture payment engine modeled after enterprise payment orchestrators (such as Hyperswitch and Stripe). When processing millions of transactions, financial systems encounter race conditions, network partition timeouts, and double-swipes.
 
@@ -69,75 +69,47 @@ LoomPay provides a composable, modular backend in Java 21 to solve these distrib
 
 ---
 
-## 🏗️ System Design & Core Modules
+## System Design & Core Modules
 
-<details>
-<summary><h3>1. Concurrency: Redis Distributed Mutex Lock</h3></summary>
-
+### 1. Concurrency: Redis Distributed Mutex Lock
 * **Mechanism**: Implemented via Redis `SET key uuid NX EX 5`.
 * **Atomic Release**: Uses a custom Lua script that validates UUID ownership before releasing the key, preventing accidental unlock if processing exceeds TTL.
-* **Interview Defense**: Protects against concurrent payment taps from impatient users or automated retry bursts without locking the entire relational database.
+* **System Design Role**: Protects against concurrent payment taps from impatient users or automated retry bursts without locking the entire relational database.
 
-</details>
-
-<details>
-<summary><h3>2. Idempotency: Double-Checked Locking</h3></summary>
-
+### 2. Idempotency: Double-Checked Locking
 * **Pattern**: Checks whether an `idempotencyKey` already exists before acquiring the Redis lock, and checks again immediately after acquiring it.
 * **Safe Return**: If an identical key was already submitted, returns the existing cached `PaymentResponse` with `200 OK` rather than authorizing a duplicate transaction.
 
-</details>
-
-<details>
-<summary><h3>3. Messaging: Transactional Outbox Pattern</h3></summary>
-
+### 3. Messaging: Transactional Outbox Pattern
 * **The Problem Solved**: Eliminates the "Dual-Write" distributed transaction problem where a DB commit succeeds but an external webhook or Kafka dispatch fails.
 * **Execution**: Saves the `PaymentOrder` and an `OutboxEvent` (`status = PENDING`) inside the **exact same ACID database transaction**.
 * **Worker**: A background `@Scheduled(fixedDelay = 5000)` worker polls pending events in batches using non-blocking pagination (`Pageable`), dispatches them, and quarantines poisoned records after 3 failed retries.
 
-</details>
-
-<details>
-<summary><h3>4. Sharding: Consistent Hashing 360° Ring Router</h3></summary>
-
+### 4. Sharding: Consistent Hashing 360° Ring Router
 * **Mechanism**: Built on an in-memory `TreeMap<Integer, String>` representing a 360° hash ring.
 * **Hotspot Prevention**: Each physical server receives $N$ virtual replicas (`server#0`, `server#1`, `server#2`) scattered across the ring.
 * **Routing**: Hashes incoming merchant IDs and walks clockwise using `tailMap().firstKey()` to find the nearest server in $O(\log M)$ time.
 * **Zero Downtime**: When a server joins or leaves, only $K / N$ keys are relocated, preventing total cache invalidation.
 
-</details>
-
-<details>
-<summary><h3>5. Integrity: Double-Entry Bookkeeping Ledger</h3></summary>
-
+### 5. Integrity: Double-Entry Bookkeeping Ledger
 * **Immutable Accounting**: Financial balances are never modified with simple `balance = balance + amount` queries.
 * **Debit/Credit Pairing**: Every successful transaction generates two immutable rows in `ledger_entries`:
   * `DEBIT` from `Customer_Account`
   * `CREDIT` to `Merchant_Account`
 * **Integrity Invariant**: Sum of all debits must equal sum of all credits across the entire ledger.
 
-</details>
-
-<details>
-<summary><h3>6. Traffic: Token-Bucket Rate Limiter</h3></summary>
-
+### 6. Traffic: Token-Bucket Rate Limiter
 * **Mechanism**: Redis-backed fixed-window counter using `INCR` + `EXPIRE` registered via Spring MVC `HandlerInterceptor`.
 * **Enforcement**: Limits incoming requests per `X-Merchant-Id` (default: 5 requests per 10 seconds).
 * **HTTP 429 Response**: Excess traffic is rejected with `HTTP 429 Too Many Requests` alongside a standard `Retry-After: 10` header.
 
-</details>
-
-<details>
-<summary><h3>7. Recovery: Automated Reconciliation Engine</h3></summary>
-
+### 7. Recovery: Automated Reconciliation Engine
 * **Cron Worker**: A background scheduler (`@Scheduled(fixedDelay = 60000)`) searches for transactions stuck in `PROCESSING` status older than 5 minutes.
 * **Resolution**: Reconciles dangling states with upstream mock gateways and updates timed-out records to `FAILED`, releasing temporary holds.
 
-</details>
-
 ---
 
-## 🔄 Architecture & Transaction Lifecycle
+## Architecture & Transaction Lifecycle
 
 ```text
   Customer Request (POST /api/v1/payments)
@@ -186,7 +158,7 @@ LoomPay provides a composable, modular backend in Java 21 to solve these distrib
 
 ---
 
-## 🚀 Quickstart (Local Docker Setup)
+## Quickstart (Local Docker Setup)
 
 ### 1. Prerequisites
 * **Java 21**
@@ -211,7 +183,7 @@ The service will start on `http://localhost:8081`.
 
 ---
 
-## 📡 API Reference & Usage
+## API Reference & Usage
 
 ### 1. Create Payment
 Executes an idempotent, rate-limited payment swipe:
@@ -267,7 +239,7 @@ done
 
 ---
 
-## 💻 Operator Console (Frontend)
+## Operator Console (Frontend)
 
 LoomPay includes a high-performance operator console built with **Vite, React, TypeScript, and Tailwind CSS** located in [`frontend/`](frontend/):
 
@@ -283,7 +255,7 @@ Live Demo is accessible at: **[loompay.abhiram.tech](https://loompay.abhiram.tec
 
 ---
 
-## 🧪 Verification & Test Suite
+## Verification & Test Suite
 
 LoomPay maintains a strict, hermetic unit and integration test suite (Mockito, JUnit 5) verifying concurrency isolation, idempotency bypass paths, and lock release guarantees.
 
