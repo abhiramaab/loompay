@@ -21,21 +21,21 @@ export function LoomPayMark({ size = 36, className, animated = false }: MarkProp
     >
       <defs>
         <linearGradient id="mark-grad" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#818CF8" />
-          <stop offset="0.5" stopColor="#22D3EE" />
-          <stop offset="1" stopColor="#34D399" />
+          <stop stopColor="#0A84FF" />
+          <stop offset="0.5" stopColor="#007AFF" />
+          <stop offset="1" stopColor="#32ADE6" />
         </linearGradient>
         <linearGradient id="mark-grad-2" x1="14" y1="10" x2="52" y2="54" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#A5B4FC" />
-          <stop offset="1" stopColor="#67E8F9" />
+          <stop stopColor="#0A84FF" />
+          <stop offset="1" stopColor="#32ADE6" />
         </linearGradient>
         <linearGradient id="mark-grad-3" x1="20" y1="14" x2="48" y2="50" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#C7D2FE" />
-          <stop offset="1" stopColor="#6EE7B7" />
+          <stop stopColor="#5AC8FA" />
+          <stop offset="1" stopColor="#32ADE6" />
         </linearGradient>
       </defs>
 
-      <rect x="1.5" y="1.5" width="61" height="61" rx="17" fill="#0B0B13" />
+      <rect x="1.5" y="1.5" width="61" height="61" rx="17" fill="#FFFFFF" />
       <rect
         x="1.5"
         y="1.5"
@@ -43,7 +43,7 @@ export function LoomPayMark({ size = 36, className, animated = false }: MarkProp
         height="61"
         rx="17"
         stroke="url(#mark-grad)"
-        strokeOpacity="0.35"
+        strokeOpacity="0.28"
         strokeWidth="1.25"
       />
 

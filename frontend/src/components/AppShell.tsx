@@ -95,7 +95,7 @@ function MobileNav() {
             <span
               className={cn(
                 'flex flex-col items-center gap-1 rounded-lg py-1.5 text-2xs font-medium transition-colors',
-                isActive ? 'text-brand-300' : 'text-mist-500',
+                isActive ? 'text-brand-500' : 'text-mist-500',
               )}
             >
               <Icon className="h-5 w-5" />
@@ -112,7 +112,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="relative min-h-screen">
       <div className="pointer-events-none fixed inset-0 bg-grid-fade" />
-      <div className="pointer-events-none fixed inset-0 opacity-[0.035] mix-blend-soft-light noise" />
       <div className="relative flex">
         <Sidebar />
         <div className="flex min-h-screen w-full flex-col">

@@ -35,7 +35,7 @@ export function CopyableId({
       )}
     >
       <span className="truncate">{display ?? value}</span>
-      <span className="text-mist-600 transition-colors group-hover:text-brand-300">
+      <span className="text-mist-600 transition-colors group-hover:text-brand-500">
         {copied ? <CheckIcon className="h-3.5 w-3.5" /> : <CopyIcon className="h-3.5 w-3.5" />}
       </span>
     </button>

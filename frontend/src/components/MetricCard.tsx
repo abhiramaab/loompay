@@ -5,10 +5,10 @@ import { cn } from '@/lib/utils'
 type AccentTone = 'brand' | 'mint' | 'cyan' | 'rose'
 
 const ACCENTS: Record<AccentTone, { text: string; glow: string }> = {
-  brand: { text: 'text-brand-300', glow: 'bg-brand-500/20' },
-  mint: { text: 'text-mint-300', glow: 'bg-mint-500/20' },
-  cyan: { text: 'text-cyanx-300', glow: 'bg-cyanx-500/20' },
-  rose: { text: 'text-rosex-300', glow: 'bg-rosex-500/20' },
+  brand: { text: 'text-brand-500', glow: 'bg-brand-500/10' },
+  mint: { text: 'text-mint-500', glow: 'bg-mint-500/10' },
+  cyan: { text: 'text-cyanx-500', glow: 'bg-cyanx-500/10' },
+  rose: { text: 'text-rosex-500', glow: 'bg-rosex-500/10' },
 }
 
 interface Props {

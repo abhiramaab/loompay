@@ -27,11 +27,11 @@ export function StateMachine({ active }: { active?: PaymentStatus }) {
     <svg viewBox="0 0 460 175" className="h-auto w-full" role="img" aria-label="Payment lifecycle">
       <defs>
         <linearGradient id="sm-edge" x1="0" y1="0" x2="1" y2="0">
-          <stop stopColor="#6366f1" />
-          <stop offset="1" stopColor="#22d3ee" />
+          <stop stopColor="#007aff" />
+          <stop offset="1" stopColor="#32ade6" />
         </linearGradient>
         <marker id="sm-arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#4f4f6a" />
+          <path d="M0,0 L6,3 L0,6 Z" fill="#bcbec9" />
         </marker>
       </defs>
 
@@ -52,7 +52,7 @@ export function StateMachine({ active }: { active?: PaymentStatus }) {
             key={`${from}-${to}`}
             d={d}
             fill="none"
-            stroke={isActive ? 'url(#sm-edge)' : '#33334a'}
+            stroke={isActive ? 'url(#sm-edge)' : '#d5d6de'}
             strokeWidth={isActive ? 2 : 1.5}
             markerEnd="url(#sm-arrow)"
             initial={{ pathLength: 0, opacity: 0 }}
@@ -80,8 +80,8 @@ export function StateMachine({ active }: { active?: PaymentStatus }) {
                 height={nodeH + 6}
                 rx="12"
                 fill="none"
-                stroke="#6366f1"
-                strokeOpacity="0.5"
+                stroke="#007aff"
+                strokeOpacity="0.55"
                 strokeWidth="1.5"
                 animate={{ opacity: [0.35, 0.9, 0.35] }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -93,8 +93,8 @@ export function StateMachine({ active }: { active?: PaymentStatus }) {
               width={nodeW}
               height={nodeH}
               rx="10"
-              className={cn(isActive ? 'fill-ink-750' : 'fill-ink-850')}
-              stroke={isActive ? '#818cf8' : '#33334a'}
+              className={cn(isActive ? 'fill-brand-50' : 'fill-ink-800')}
+              stroke={isActive ? '#3d9bff' : '#d5d6de'}
               strokeWidth="1.25"
             />
             <circle cx={x - nodeW / 2 + 14} cy={y} r="3" className={meta.dot} />

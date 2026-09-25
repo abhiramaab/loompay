@@ -18,9 +18,9 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | null>(null)
 
 const TONES: Record<ToastTone, { ring: string; icon: string; accent: string }> = {
-  success: { ring: 'border-mint-500/40', icon: 'text-mint-300', accent: 'bg-mint-400' },
-  error: { ring: 'border-rosex-500/40', icon: 'text-rosex-300', accent: 'bg-rosex-400' },
-  info: { ring: 'border-brand-500/40', icon: 'text-brand-300', accent: 'bg-brand-400' },
+  success: { ring: 'border-mint-500/40', icon: 'text-mint-500', accent: 'bg-mint-400' },
+  error: { ring: 'border-rosex-500/40', icon: 'text-rosex-500', accent: 'bg-rosex-400' },
+  info: { ring: 'border-brand-500/40', icon: 'text-brand-500', accent: 'bg-brand-400' },
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {

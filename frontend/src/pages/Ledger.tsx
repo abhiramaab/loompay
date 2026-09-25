@@ -96,7 +96,7 @@ export function Ledger() {
       >
         <div className="flex items-center justify-between border-b border-ink-800 px-5 py-4">
           <div className="flex items-center gap-2">
-            <BookIcon className="h-4 w-4 text-cyanx-300" />
+            <BookIcon className="h-4 w-4 text-cyanx-500" />
             <p className="text-sm font-semibold text-mist-100">Journal</p>
           </div>
           <span className="text-2xs text-mist-500">Projected from session orders</span>
@@ -134,7 +134,7 @@ export function Ledger() {
                     <td className="px-5 py-3">
                       <Link
                         to={`/payments/${row.orderId}`}
-                        className="text-brand-300 transition-colors hover:text-brand-200"
+                        className="text-brand-500 transition-colors hover:text-brand-600"
                       >
                         <CopyableId value={row.orderId} display={shortId(row.orderId, 12)} />
                       </Link>
@@ -145,8 +145,8 @@ export function Ledger() {
                         className={cn(
                           'chip',
                           row.entryType === 'DEBIT'
-                            ? 'border-rosex-500/40 bg-rosex-500/10 text-rosex-300'
-                            : 'border-mint-500/40 bg-mint-500/10 text-mint-300',
+                            ? 'border-rosex-500/40 bg-rosex-500/10 text-rosex-500'
+                            : 'border-mint-500/40 bg-mint-500/10 text-mint-500',
                         )}
                       >
                         {row.entryType}

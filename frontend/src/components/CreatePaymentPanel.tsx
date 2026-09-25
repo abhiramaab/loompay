@@ -133,7 +133,7 @@ export function CreatePaymentPanel({ open, onClose, onCreated }: Props) {
                       initial={{ scale: 0.6, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      className="relative flex h-16 w-16 items-center justify-center rounded-full border border-mint-500/40 bg-mint-500/10 text-mint-300"
+                      className="relative flex h-16 w-16 items-center justify-center rounded-full border border-mint-500/40 bg-mint-500/10 text-mint-500"
                     >
                       <span className="absolute inset-0 animate-pulse-ring rounded-full border border-mint-400/40" />
                       <CheckIcon className="h-7 w-7" />
@@ -249,7 +249,7 @@ export function CreatePaymentPanel({ open, onClose, onCreated }: Props) {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="rounded-xl border border-rosex-500/40 bg-rosex-500/10 px-4 py-3 text-xs text-rosex-300"
+                          className="rounded-xl border border-rosex-500/40 bg-rosex-500/10 px-4 py-3 text-xs text-rosex-500"
                         >
                           {error}
                         </motion.div>

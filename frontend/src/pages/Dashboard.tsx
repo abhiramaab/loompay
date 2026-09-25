@@ -141,7 +141,7 @@ export function Dashboard() {
                 Normalized volume
               </p>
             </div>
-            <span className="chip border-mint-500/40 bg-mint-500/10 text-mint-300">
+            <span className="chip border-mint-500/40 bg-mint-500/10 text-mint-500">
               <CheckIcon className="h-3 w-3" />
               ledger balanced
             </span>
@@ -187,7 +187,7 @@ export function Dashboard() {
             </div>
             <Link
               to="/payments"
-              className="flex items-center gap-1 text-xs font-medium text-brand-300 transition-colors hover:text-brand-200"
+              className="flex items-center gap-1 text-xs font-medium text-brand-500 transition-colors hover:text-brand-600"
             >
               View all
               <ArrowRightIcon className="h-3.5 w-3.5" />
@@ -240,7 +240,7 @@ export function Dashboard() {
           <div className="mt-4 flex flex-col gap-3">
             {FEATURES.map(({ icon: Icon, title, body }) => (
               <div key={title} className="flex gap-3">
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-ink-700 bg-ink-850 text-brand-300">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-ink-700 bg-ink-850 text-brand-500">
                   <Icon className="h-3.5 w-3.5" />
                 </div>
                 <div>

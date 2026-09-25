@@ -80,7 +80,7 @@ export function PaymentDetail() {
         <DetailSkeleton />
       ) : error || !payment ? (
         <div className="card flex flex-col items-center px-6 py-16 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-rosex-500/40 bg-rosex-500/10 text-rosex-300">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-rosex-500/40 bg-rosex-500/10 text-rosex-500">
             <AlertIcon className="h-6 w-6" />
           </div>
           <p className="mt-4 text-sm font-medium text-mist-200">Order not found</p>
@@ -144,7 +144,7 @@ export function PaymentDetail() {
               className="card p-6"
             >
               <div className="flex items-center gap-2">
-                <ClockIcon className="h-4 w-4 text-brand-300" />
+                <ClockIcon className="h-4 w-4 text-brand-500" />
                 <p className="text-sm font-semibold text-mist-100">Lifecycle timeline</p>
               </div>
               <ol className="mt-5">
@@ -162,9 +162,9 @@ export function PaymentDetail() {
                       className={cn(
                         'relative z-10 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border',
                         step.current
-                          ? 'border-brand-400 bg-brand-500/20 text-brand-200'
+                          ? 'border-brand-400 bg-brand-500/20 text-brand-600'
                           : step.reached
-                            ? 'border-mint-500/50 bg-mint-500/15 text-mint-300'
+                            ? 'border-mint-500/50 bg-mint-500/15 text-mint-500'
                             : 'border-ink-700 bg-ink-850 text-mist-600',
                       )}
                     >
@@ -195,7 +195,7 @@ export function PaymentDetail() {
               className="card p-6"
             >
               <div className="flex items-center gap-2">
-                <BookIcon className="h-4 w-4 text-cyanx-300" />
+                <BookIcon className="h-4 w-4 text-cyanx-500" />
                 <p className="text-sm font-semibold text-mist-100">Ledger preview</p>
               </div>
               <p className="mt-1 text-2xs text-mist-500">
@@ -220,8 +220,8 @@ export function PaymentDetail() {
                       className={cn(
                         'chip',
                         row.type === 'DEBIT'
-                          ? 'border-rosex-500/40 bg-rosex-500/10 text-rosex-300'
-                          : 'border-mint-500/40 bg-mint-500/10 text-mint-300',
+                          ? 'border-rosex-500/40 bg-rosex-500/10 text-rosex-500'
+                          : 'border-mint-500/40 bg-mint-500/10 text-mint-500',
                       )}
                     >
                       {row.type}

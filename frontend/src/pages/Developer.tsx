@@ -104,10 +104,10 @@ export function Developer() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="card mb-4 flex flex-col gap-3 border-brand-500/30 bg-brand-gradient/5 p-5 sm:flex-row sm:items-center sm:justify-between"
+        className="card mb-4 flex flex-col gap-3 border-brand-500/30 bg-brand-soft p-5 sm:flex-row sm:items-center sm:justify-between"
       >
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg border border-brand-500/40 bg-brand-500/10 text-brand-300">
+          <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg border border-brand-500/30 bg-brand-500/10 text-brand-500">
             <InfoIcon className="h-4 w-4" />
           </div>
           <div>
@@ -135,8 +135,8 @@ export function Developer() {
                   className={cn(
                     'chip font-mono',
                     endpoint.method === 'POST'
-                      ? 'border-brand-500/40 bg-brand-500/10 text-brand-200'
-                      : 'border-cyanx-500/40 bg-cyanx-500/10 text-cyanx-300',
+                      ? 'border-brand-500/30 bg-brand-500/10 text-brand-600'
+                      : 'border-cyanx-500/30 bg-cyanx-500/10 text-cyanx-500',
                   )}
                 >
                   {endpoint.method}
@@ -146,8 +146,8 @@ export function Developer() {
                   className={cn(
                     'chip ml-auto',
                     endpoint.status === 'available'
-                      ? 'border-mint-500/40 bg-mint-500/10 text-mint-300'
-                      : 'border-ink-600 bg-ink-800 text-mist-500',
+                      ? 'border-mint-500/30 bg-mint-500/10 text-mint-500'
+                      : 'border-ink-600 bg-ink-750 text-mist-500',
                   )}
                 >
                   {endpoint.status === 'available' ? 'available' : 'pending'}
@@ -179,7 +179,7 @@ function EndpointBody({ body, headers }: { body: string; headers?: Record<string
     <div className="mt-3">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="text-2xs font-medium text-brand-300 transition-colors hover:text-brand-200"
+        className="text-2xs font-medium text-brand-500 transition-colors hover:text-brand-600"
       >
         {open ? 'Hide' : 'Show'} sample request
       </button>
@@ -187,7 +187,7 @@ function EndpointBody({ body, headers }: { body: string; headers?: Record<string
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="mt-2 overflow-hidden rounded-xl border border-ink-700 bg-ink-950/60"
+          className="mt-2 overflow-hidden rounded-xl border border-ink-700 bg-ink-750"
         >
           {headers && (
             <pre className="border-b border-ink-800 px-4 py-3 font-mono text-2xs text-mist-500">
@@ -225,7 +225,7 @@ function CodeCard({ title, code }: { title: string; code: string }) {
             setCopied(true)
             setTimeout(() => setCopied(false), 1400)
           }}
-          className="text-mist-500 transition-colors hover:text-brand-300"
+          className="text-mist-500 transition-colors hover:text-brand-500"
         >
           {copied ? <CheckIcon className="h-3.5 w-3.5" /> : <CopyIcon className="h-3.5 w-3.5" />}
         </button>

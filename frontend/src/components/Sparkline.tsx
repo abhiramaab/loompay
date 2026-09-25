@@ -8,7 +8,7 @@ interface Props {
   className?: string
 }
 
-export function Sparkline({ data, color = '#818CF8', height = 48, className }: Props) {
+export function Sparkline({ data, color = '#007AFF', height = 48, className }: Props) {
   const gradientId = useId()
   if (data.length < 2) {
     data = [0, 0]

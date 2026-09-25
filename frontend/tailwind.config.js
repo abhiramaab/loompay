@@ -4,55 +4,58 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Light surfaces (larger number = deeper/darker background).
         ink: {
-          950: '#07070c',
-          900: '#0b0b13',
-          850: '#101019',
-          800: '#14141f',
-          750: '#1a1a27',
-          700: '#232333',
-          600: '#2f2f42',
-          500: '#3d3d52',
+          950: '#f2f2f7', // iOS systemGroupedBackground
+          900: '#f7f8fb',
+          850: '#ffffff',
+          800: '#ffffff',
+          750: '#f2f3f7',
+          700: '#e5e6ec', // separators / borders
+          600: '#d5d6de',
+          500: '#bcbec9',
         },
+        // Dark text (larger number = lighter/muted text).
         mist: {
-          100: '#f4f5fb',
-          200: '#e2e4f0',
-          300: '#c7cad9',
-          400: '#9a9db4',
-          500: '#71748c',
-          600: '#50526a',
+          100: '#1c1c1e', // primary label
+          200: '#2c2c2e',
+          300: '#3a3a3c',
+          400: '#5c5c60', // secondary label
+          500: '#6e6e73', // tertiary label
+          600: '#8e8e93', // quaternary (iOS systemGray)
         },
+        // Apple system blue.
         brand: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
+          50: '#eff6ff',
+          100: '#e0efff',
+          200: '#bfdfff',
+          300: '#7cb8ff',
+          400: '#3d9bff',
+          500: '#007aff',
+          600: '#0062cc',
+          700: '#0050a6',
+          800: '#003f82',
+          900: '#002f61',
         },
         cyanx: {
-          300: '#67e8f9',
-          400: '#22d3ee',
-          500: '#06b6d4',
+          300: '#7fd7ff',
+          400: '#32ade6',
+          500: '#0091d5',
         },
         mint: {
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981',
+          300: '#5fd98a',
+          400: '#34c759',
+          500: '#248a3d',
         },
         amberx: {
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
+          300: '#ffd60a',
+          400: '#ffcc00',
+          500: '#c29b00',
         },
         rosex: {
-          300: '#fda4af',
-          400: '#fb7185',
-          500: '#f43f5e',
+          300: '#ff6961',
+          400: '#ff3b30',
+          500: '#d70015',
         },
       },
       fontFamily: {
@@ -64,15 +67,15 @@ export default {
         '2xs': ['0.6875rem', { lineHeight: '1rem' }],
       },
       boxShadow: {
-        glow: '0 0 0 1px rgba(99,102,241,0.16), 0 18px 60px -18px rgba(99,102,241,0.55)',
-        card: '0 1px 0 0 rgba(255,255,255,0.04) inset, 0 24px 60px -32px rgba(0,0,0,0.9)',
-        lift: '0 24px 70px -30px rgba(0,0,0,0.85)',
+        glow: '0 1px 2px rgba(0,122,255,0.24), 0 10px 28px -8px rgba(0,122,255,0.5)',
+        card: '0 1px 2px rgba(16,24,40,0.04), 0 10px 30px -18px rgba(16,24,40,0.18)',
+        lift: '0 18px 48px -20px rgba(16,24,40,0.28)',
       },
       backgroundImage: {
-        'brand-gradient': 'linear-gradient(120deg, #6366f1 0%, #22d3ee 55%, #34d399 100%)',
-        'brand-soft': 'linear-gradient(135deg, rgba(99,102,241,0.16), rgba(34,211,238,0.10))',
+        'brand-gradient': 'linear-gradient(120deg, #007aff 0%, #32ade6 55%, #5ac8fa 100%)',
+        'brand-soft': 'linear-gradient(135deg, rgba(0,122,255,0.10), rgba(90,200,250,0.08))',
         'grid-fade':
-          'radial-gradient(ellipse 70% 55% at 50% -10%, rgba(99,102,241,0.20), transparent 60%)',
+          'radial-gradient(ellipse 75% 55% at 50% -12%, rgba(0,122,255,0.12), transparent 62%)',
       },
       keyframes: {
         'fade-up': {
