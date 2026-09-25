@@ -6,33 +6,42 @@ interface MarkProps {
   size?: number
   className?: string
   animated?: boolean
-  /** Render the rounded blue tile. When false, just the L is drawn. */
+  /**
+   * Render the rounded blue tile behind the mark. When false the needle and
+   * thread are drawn directly on a transparent background.
+   */
   tile?: boolean
-  /** Stroke colour when `tile` is false. */
-  tone?: 'blue' | 'current'
+  /** Force a colour. Defaults to the brand gradient. */
+  tone?: 'brand' | 'current'
 }
 
 /**
- * LoomPay monogram: a single continuous "L" stroke — the thread — resting on a
- * rounded tile, with two woven weft lines crossing it.
+ * LoomPay monogram: a needle with a thread running through its eye.
+ *
+ * The needle is drawn as an outlined, tapered form so the eye is a genuine
+ * opening — the mark stays transparent instead of sitting on a filled tile.
+ * The thread passes through the eye and sweeps down into the foot of an "L",
+ * so the mark reads as both a weaving tool and the initial.
  */
 export function LoomPayMark({
   size = 36,
   className,
   animated = false,
-  tile = true,
-  tone = 'blue',
+  tile = false,
+  tone = 'brand',
 }: MarkProps) {
   const uid = useId().replace(/:/g, '')
-  const blueId = `lp-blue-${uid}`
-  const threadId = `lp-thread-${uid}`
-  const stroke = tile ? '#FFFFFF' : tone === 'current' ? 'currentColor' : '#007AFF'
-  const threadStroke = tile ? '#FFFFFF' : '#32ADE6'
+  const threadGrad = `lp-thread-${uid}`
+  const needleGrad = `lp-needle-${uid}`
 
-  const draw = (delay: number) => ({
+  const isCurrent = tone === 'current'
+  const needleStroke = tile ? '#FFFFFF' : isCurrent ? 'currentColor' : `url(#${needleGrad})`
+  const threadStroke = tile ? 'rgba(255,255,255,0.9)' : isCurrent ? 'currentColor' : `url(#${threadGrad})`
+
+  const draw = (delay: number, duration = 0.7) => ({
     initial: animated ? { pathLength: 0, opacity: 0 } : false,
     animate: animated ? { pathLength: 1, opacity: 1 } : undefined,
-    transition: { duration: 0.7, delay, ease: [0.65, 0, 0.35, 1] as const },
+    transition: { duration, delay, ease: [0.65, 0, 0.35, 1] as const },
   })
 
   return (
@@ -47,63 +56,70 @@ export function LoomPayMark({
       aria-label="LoomPay"
     >
       <defs>
-        <linearGradient id={blueId} x1="18" y1="14" x2="48" y2="52" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#0A84FF" />
-          <stop offset="1" stopColor="#007AFF" />
+        <linearGradient id={needleGrad} x1="22" y1="42" x2="46" y2="12" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#007AFF" />
+          <stop offset="1" stopColor="#3D9BFF" />
         </linearGradient>
-        <linearGradient id={threadId} x1="14" y1="20" x2="50" y2="48" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#5AC8FA" />
-          <stop offset="1" stopColor="#32ADE6" />
+        <linearGradient id={threadGrad} x1="10" y1="12" x2="56" y2="54" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#32ADE6" />
+          <stop offset="1" stopColor="#5AC8FA" />
         </linearGradient>
+        <mask id={`${needleGrad}-mask`}>
+          <rect x="0" y="0" width="64" height="64" fill="white" />
+          <ellipse
+            cx="23.2"
+            cy="40.4"
+            rx="1.25"
+            ry="2.5"
+            transform="rotate(-36.5 23.2 40.4)"
+            fill="black"
+          />
+        </mask>
       </defs>
 
       {tile && (
         <>
-          <rect x="0.5" y="0.5" width="63" height="63" rx="18" fill={`url(#${blueId})`} />
+          <rect x="0.5" y="0.5" width="63" height="63" rx="17" fill={`url(#${needleGrad})`} />
           <rect
             x="0.5"
             y="0.5"
             width="63"
             height="63"
-            rx="18"
-            fill={`url(#${threadId})`}
-            fillOpacity="0.16"
+            rx="17"
+            fill={`url(#${threadGrad})`}
+            fillOpacity="0.18"
           />
         </>
       )}
 
+      {/* Thread: passes through the eye, then sweeps down to form the L foot. */}
       <motion.path
-        d="M22 18 V40.5 A5.5 5.5 0 0 0 27.5 46 H42"
-        stroke={stroke}
-        strokeWidth="5.4"
+        d="M9.5 10.5 C13 21 17.5 31 23.2 40.4 C26 46.5 31.5 50.5 38.5 51.6 C45.5 52.7 51.5 50.2 55 45.5"
+        stroke={threadStroke}
+        strokeWidth="3.4"
         strokeLinecap="round"
         strokeLinejoin="round"
-        {...draw(0)}
+        fill="none"
+        {...draw(0.1, 0.95)}
       />
       <motion.path
-        d="M25.5 24 H39"
+        d="M55 45.5 C56.8 43.8 57.8 42 58.2 40.2"
         stroke={threadStroke}
-        strokeOpacity={tile ? 0.34 : 0.6}
-        strokeWidth="2.1"
+        strokeWidth="3.4"
         strokeLinecap="round"
-        {...draw(0.22)}
+        fill="none"
+        {...draw(1.0, 0.4)}
       />
+
+      {/* Needle drawn over the thread, tapering to a sharp point (upper-right). */}
       <motion.path
-        d="M25.5 31 H36.5"
-        stroke={threadStroke}
-        strokeOpacity={tile ? 0.22 : 0.42}
-        strokeWidth="2.1"
-        strokeLinecap="round"
-        {...draw(0.34)}
-      />
-      <motion.circle
-        cx="42"
-        cy="46"
-        r="3.4"
-        fill={stroke}
-        initial={animated ? { scale: 0, opacity: 0 } : false}
-        animate={animated ? { scale: 1, opacity: 1 } : undefined}
-        transition={{ duration: 0.4, delay: 0.6, type: 'spring', stiffness: 320, damping: 18 }}
+        d="M20.6 45.8 L22.2 41.5 L42.6 13.7 L46.2 10.2 L44.9 15.1 L24.5 43.2 Z"
+        fill={needleStroke}
+        mask={`url(#${needleGrad}-mask)`}
+        initial={animated ? { opacity: 0, scale: 0.94 } : false}
+        animate={animated ? { opacity: 1, scale: 1 } : undefined}
+        transition={{ duration: 0.45, delay: 0.35 }}
+        style={{ transformOrigin: '33px 28px' }}
       />
     </svg>
   )
@@ -113,7 +129,7 @@ interface LogoProps {
   className?: string
   size?: number
   showWordmark?: boolean
-  /** Wordmark colour scheme. */
+  /** Colour scheme for the wordmark and mark. */
   variant?: 'default' | 'light'
 }
 
@@ -126,7 +142,12 @@ export function LoomPayLogo({
   const isLight = variant === 'light'
   return (
     <div className={cn('flex items-center gap-2.5', className)}>
-      <LoomPayMark size={size} />
+      <LoomPayMark
+        size={size}
+        tile={isLight}
+        tone={isLight ? 'current' : 'brand'}
+        className={isLight ? 'text-white' : undefined}
+      />
       {showWordmark && (
         <span
           className={cn(
