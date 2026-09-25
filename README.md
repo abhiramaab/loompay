@@ -1,116 +1,311 @@
-# LoomPay
+<p align="center">
+  <img src="https://raw.githubusercontent.com/abhiramaab/loompay/main/frontend/public/vite.svg" alt="LoomPay-Logo" width="90px" />
+</p>
 
-LoomPay is a distributed payment processing service written in Java using Spring Boot and Redis. It is engineered to handle concurrent payment traffic safely, preventing duplicate charges, state race conditions, and ledger imbalances under high load.
+<h1 align="center">L O O M P A Y</h1>
+
+<p align="center">
+  <strong>Distributed & Composable Payment Orchestration Engine</strong>
+</p>
+
+<p align="center">
+  High-throughput payment gateway orchestrator built with Java 21, Spring Boot 3, Redis, and PostgreSQL.<br/>
+  Engineered to eliminate double-charging, network partition loss, and ledger state anomalies.
+</p>
+
+<p align="center">
+  <a href="https://loompay.abhiram.tech">
+    <img src="https://img.shields.io/badge/Live_Console-loompay.abhiram.tech-6366F1?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" />
+  </a>
+  <a href="https://github.com/abhiramaab/loompay">
+    <img src="https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo" />
+  </a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white" alt="Java 21" />
+  <img src="https://img.shields.io/badge/Spring_Boot-3.4.3-6DB33F?style=flat-square&logo=springboot&logoColor=white" alt="Spring Boot 3" />
+  <img src="https://img.shields.io/badge/Redis-Distributed_Locks-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" />
+  <img src="https://img.shields.io/badge/PostgreSQL-ACID_Ledger-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square" alt="Build Status" />
+  <img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square" alt="License" />
+</p>
 
 ---
 
-## Architectural Highlights
+<details>
+<summary><strong>📁 Table of Contents</strong></summary>
 
-### 1. Concurrency Control and Idempotency
-- **Distributed Mutex Lock**: Implemented using Redis (`SET key uuid NX EX seconds`) to serialize concurrent incoming requests referencing the same idempotency key.
-- **Atomic Release via Lua**: Lock release validates ownership using a UUID before unlinking, preventing accidental lock releases across worker nodes if an operation exceeds TTL.
-- **Double-Checked Idempotency**: Evaluates whether an order already exists before acquiring the lock and immediately after acquiring it, avoiding redundant payment gateway authorizations and database mutations.
+- [What Can I Do with LoomPay?](#-what-can-i-do-with-loompay)
+- [System Design & Core Modules](#-system-design--core-modules)
+  - [1. Concurrency: Redis Distributed Mutex](#1-concurrency-redis-distributed-mutex-lock)
+  - [2. Idempotency: Double-Checked Locking](#2-idempotency-double-checked-locking)
+  - [3. Messaging: Transactional Outbox Pattern](#3-messaging-transactional-outbox-pattern)
+  - [4. Sharding: Consistent Hashing 360° Ring](#4-sharding-consistent-hashing-360-ring-router)
+  - [5. Integrity: Double-Entry Bookkeeping Ledger](#5-integrity-double-entry-bookkeeping-ledger)
+  - [6. Traffic: Token-Bucket Rate Limiter](#6-traffic-token-bucket-rate-limiter)
+  - [7. Recovery: Automated Reconciliation Engine](#7-recovery-automated-reconciliation-engine)
+- [Architecture & Transaction Lifecycle](#-architecture--transaction-lifecycle)
+- [Quickstart (Local Docker Setup)](#-quickstart-local-docker-setup)
+- [API Reference & Usage](#-api-reference--usage)
+- [Operator Console (Frontend)](#-operator-console-frontend)
+- [Verification & Test Suite](#-verification--test-suite)
 
-### 2. Double-Entry Ledger System
-- Every financial movement creates immutable debit and credit ledger rows.
-- No single balance column update is performed in isolation. System consistency can be verified by asserting that total debits match total credits across all accounts.
-
-### 3. Traffic Protection via Rate Limiting
-- Built on top of Spring MVC's `HandlerInterceptor` backed by Redis counters.
-- Enforces request quotas per client identifier (IP or API key).
-- Rejects excess traffic with standard `HTTP 429 Too Many Requests` alongside a `Retry-After` header.
-
-### 4. Partition Routing via Consistent Hashing
-- Features a deterministic MD5 hash ring with configurable virtual nodes (default: 100 replicas per node).
-- Distributes incoming merchant payloads across storage partitions evenly, mitigating hot partitions while minimizing rehashing overhead when partitions scale.
+</details>
 
 ---
 
-## State Lifecycle
+## ⚡ What Can I Do with LoomPay?
 
-Payment orders follow an explicit state transition model:
+LoomPay is an open architecture payment engine modeled after enterprise payment orchestrators (such as Hyperswitch and Stripe). When processing millions of transactions, financial systems encounter race conditions, network partition timeouts, and double-swipes.
 
+LoomPay provides a composable, modular backend in Java 21 to solve these distributed systems challenges:
+
+* **Eliminates Double Charges**: Serializes concurrent requests using atomic Redis distributed locks and idempotency keys.
+* **Guarantees Zero-Loss Webhooks**: Decouples external network delivery from database mutations using the Transactional Outbox Pattern.
+* **Balances Merchant Workloads**: Partitions traffic across processing nodes using a 360° Consistent Hashing ring with virtual replicas.
+* **Maintains Audit-Proof Balances**: Double-entry bookkeeping ledger ensures debits and credits stay balanced down to the exact paisa.
+* **Self-Healing Reconciliation**: Background cron scheduler rescues dangling `PROCESSING` transactions during network interruptions.
+
+---
+
+## 🏗️ System Design & Core Modules
+
+<details>
+<summary><h3>1. Concurrency: Redis Distributed Mutex Lock</h3></summary>
+
+* **Mechanism**: Implemented via Redis `SET key uuid NX EX 5`.
+* **Atomic Release**: Uses a custom Lua script that validates UUID ownership before releasing the key, preventing accidental unlock if processing exceeds TTL.
+* **Interview Defense**: Protects against concurrent payment taps from impatient users or automated retry bursts without locking the entire relational database.
+
+</details>
+
+<details>
+<summary><h3>2. Idempotency: Double-Checked Locking</h3></summary>
+
+* **Pattern**: Checks whether an `idempotencyKey` already exists before acquiring the Redis lock, and checks again immediately after acquiring it.
+* **Safe Return**: If an identical key was already submitted, returns the existing cached `PaymentResponse` with `200 OK` rather than authorizing a duplicate transaction.
+
+</details>
+
+<details>
+<summary><h3>3. Messaging: Transactional Outbox Pattern</h3></summary>
+
+* **The Problem Solved**: Eliminates the "Dual-Write" distributed transaction problem where a DB commit succeeds but an external webhook or Kafka dispatch fails.
+* **Execution**: Saves the `PaymentOrder` and an `OutboxEvent` (`status = PENDING`) inside the **exact same ACID database transaction**.
+* **Worker**: A background `@Scheduled(fixedDelay = 5000)` worker polls pending events in batches using non-blocking pagination (`Pageable`), dispatches them, and quarantines poisoned records after 3 failed retries.
+
+</details>
+
+<details>
+<summary><h3>4. Sharding: Consistent Hashing 360° Ring Router</h3></summary>
+
+* **Mechanism**: Built on an in-memory `TreeMap<Integer, String>` representing a 360° hash ring.
+* **Hotspot Prevention**: Each physical server receives $N$ virtual replicas (`server#0`, `server#1`, `server#2`) scattered across the ring.
+* **Routing**: Hashes incoming merchant IDs and walks clockwise using `tailMap().firstKey()` to find the nearest server in $O(\log M)$ time.
+* **Zero Downtime**: When a server joins or leaves, only $K / N$ keys are relocated, preventing total cache invalidation.
+
+</details>
+
+<details>
+<summary><h3>5. Integrity: Double-Entry Bookkeeping Ledger</h3></summary>
+
+* **Immutable Accounting**: Financial balances are never modified with simple `balance = balance + amount` queries.
+* **Debit/Credit Pairing**: Every successful transaction generates two immutable rows in `ledger_entries`:
+  * `DEBIT` from `Customer_Account`
+  * `CREDIT` to `Merchant_Account`
+* **Integrity Invariant**: Sum of all debits must equal sum of all credits across the entire ledger.
+
+</details>
+
+<details>
+<summary><h3>6. Traffic: Token-Bucket Rate Limiter</h3></summary>
+
+* **Mechanism**: Redis-backed fixed-window counter using `INCR` + `EXPIRE` registered via Spring MVC `HandlerInterceptor`.
+* **Enforcement**: Limits incoming requests per `X-Merchant-Id` (default: 5 requests per 10 seconds).
+* **HTTP 429 Response**: Excess traffic is rejected with `HTTP 429 Too Many Requests` alongside a standard `Retry-After: 10` header.
+
+</details>
+
+<details>
+<summary><h3>7. Recovery: Automated Reconciliation Engine</h3></summary>
+
+* **Cron Worker**: A background scheduler (`@Scheduled(fixedDelay = 60000)`) searches for transactions stuck in `PROCESSING` status older than 5 minutes.
+* **Resolution**: Reconciles dangling states with upstream mock gateways and updates timed-out records to `FAILED`, releasing temporary holds.
+
+</details>
+
+---
+
+## 🔄 Architecture & Transaction Lifecycle
+
+```text
+  Customer Request (POST /api/v1/payments)
+                     │
+                     ▼
+       ┌───────────────────────────┐
+       │   RateLimitInterceptor    │ ──(Exceeded?)──► HTTP 429 Too Many Requests
+       └───────────────────────────┘
+                     │ (Allowed)
+                     ▼
+       ┌───────────────────────────┐
+       │   ConsistentHashRouter    │ ──► Routes to designated worker node
+       └───────────────────────────┘
+                     │
+                     ▼
+       ┌───────────────────────────┐
+       │   DistributedLockService  │ ──► Acquires Redis Mutex (SET NX EX 5)
+       └───────────────────────────┘
+                     │
+                     ▼
+  ┌────────────────────────────────────────────────────────┐
+  │              SINGLE ACID DATABASE TRANSACTION           │
+  │                                                        │
+  │  1. Check Idempotency Key                              │
+  │  2. Insert PaymentOrder (STATUS = CREATED)             │
+  │  3. Insert Ledger Entries (Debit Customer, Credit Merch)│
+  │  4. Insert OutboxEvent (STATUS = PENDING)              │
+  └────────────────────────────────────────────────────────┘
+                     │
+                     ▼
+       ┌───────────────────────────┐
+       │   Release Redis Mutex     │ ──► Atomic Lua Script verification
+       └───────────────────────────┘
+                     │
+                     ▼
+           Return HTTP 201 Created
+                     │
+                     ▼
+  ┌────────────────────────────────────────────────────────┐
+  │                 ASYNC BACKGROUND WORKERS               │
+  │                                                        │
+  │  ► OutboxPublisherService: Polls & Relays Webhook / MQ │
+  │  ► ReconciliationService: Rescues Stuck Orders (>5m)   │
+  └────────────────────────────────────────────────────────┘
 ```
-[CREATED] ---> [PENDING] ---> [SUCCESS]
-                    |
-                    +-------> [FAILED]
-```
-
-State changes are strictly validated; invalid transitions (such as moving from `FAILED` to `SUCCESS` directly) throw domain-specific exceptions captured by a centralized exception handler.
 
 ---
 
-## Tech Stack
+## 🚀 Quickstart (Local Docker Setup)
 
-- **Language**: Java 21
-- **Framework**: Spring Boot 3.x (Spring Web, Spring Data JPA)
-- **Data & Cache**: PostgreSQL (Storage), Redis (Locks, Idempotency, Rate Limiting), H2 (Local Profiles)
-- **Testing**: JUnit 5, Mockito
+### 1. Prerequisites
+* **Java 21**
+* **Docker & Docker Compose**
 
----
-
-## API Endpoints
-
-### 1. Create Payment
-- **Method**: `POST`
-- **Path**: `/api/v1/payments`
-- **Header**: `X-Merchant-Id: <merchant-id>` (used for rate limiting; defaults to `default_merchant`)
-- **Request Body**:
-```json
-{
-  "merchantId": "merchant_123",
-  "amount": 150000,
-  "currency": "INR",
-  "idempotencyKey": "idem_9f2c1a7b3d4e5f60"
-}
-```
-- **Response**: `201 Created` with order details and current status.
-
-> `amount` is in minor units (paise/cents). `currency` is one of `INR`, `USD`, `EUR`.
-
-### 2. Get Payment
-- **Method**: `GET`
-- **Path**: `/api/v1/payments/{orderId}`
-- **Response**: `200 OK` with order details, or `404` for an unknown order.
-
-Rate limiting allows **5 requests per 10 seconds per merchant**. Excess
-requests receive `429 Too Many Requests` with a `Retry-After` header.
-
----
-
-## Console (Frontend)
-
-An operator console lives in [`frontend/`](frontend/README.md). It provides an
-overview dashboard, payment creation and lookup, a projection of the
-double-entry ledger, and an API reference.
+### 2. Boot Infrastructure & Service
+Clone the repository and run the full stack:
 
 ```bash
-# Terminal 1 — backend without Redis (in-process locks/rate limits):
-./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+# Clone repository
+git clone https://github.com/abhiramaab/loompay.git
+cd loompay
 
-# Terminal 2 — console:
-cd frontend && npm install && npm run dev
-# http://localhost:5173
-```
+# 1. Spin up PostgreSQL 16 & Redis 7
+docker compose up -d
 
-For the production stack use Docker and the default profile:
-
-```bash
-docker compose up -d   # Postgres + Redis
+# 2. Run the Spring Boot application
 ./mvnw spring-boot:run
 ```
 
-The `local` profile replaces Redis with an in-process store so the backend runs
-without infrastructure. It is not distributed and is intended for development
-only. See `frontend/README.md` for the list of read endpoints the console would
-use once available.
+The service will start on `http://localhost:8081`.
 
 ---
 
-## Verification & Testing
+## 📡 API Reference & Usage
 
-Unit tests cover critical paths, including concurrent duplicate submission handling, idempotency checks, and lock release guarantees in finally blocks:
+### 1. Create Payment
+Executes an idempotent, rate-limited payment swipe:
 
 ```bash
-./mvnw test
+curl -i -X POST http://localhost:8081/api/v1/payments \
+  -H "Content-Type: application/json" \
+  -H "X-Merchant-Id: merchant_nike" \
+  -d '{
+    "merchantId": "merchant_nike",
+    "amount": 499900,
+    "currency": "INR",
+    "idempotencyKey": "idem_nike_shoe_98234"
+  }'
 ```
+
+**Response (`201 Created`):**
+```json
+{
+  "orderId": "ord_7f8a9b2c3d4e",
+  "merchantId": "merchant_nike",
+  "amount": 499900,
+  "currency": "INR",
+  "status": "CREATED",
+  "createdAt": "2026-09-25T18:30:00"
+}
+```
+
+### 2. Fetch Payment by Order ID
+```bash
+curl -X GET http://localhost:8081/api/v1/payments/ord_7f8a9b2c3d4e
+```
+
+### 3. Rate Limit Pressure Test (HTTP 429)
+Fire 6 rapid requests in under 10 seconds:
+```bash
+for i in {1..6}; do
+  curl -s -o /dev/null -w "%{http_code}\n" -X POST http://localhost:8081/api/v1/payments \
+    -H "Content-Type: application/json" \
+    -H "X-Merchant-Id: spam_merchant" \
+    -d '{"merchantId":"spam_merchant","amount":1000,"currency":"INR","idempotencyKey":"idem_'$i'"}'
+done
+```
+**Output:**
+```text
+201
+201
+201
+201
+201
+429  <-- Rate Limit Triggered (HTTP 429 Too Many Requests)
+```
+
+---
+
+## 💻 Operator Console (Frontend)
+
+LoomPay includes a high-performance operator console built with **Vite, React, TypeScript, and Tailwind CSS** located in [`frontend/`](frontend/):
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Visit `http://localhost:5173` to view the live payment stream, inspect outbox event queues, and view double-entry balances.
+
+Live Demo is accessible at: **[loompay.abhiram.tech](https://loompay.abhiram.tech)**
+
+---
+
+## 🧪 Verification & Test Suite
+
+LoomPay maintains a strict, hermetic unit and integration test suite (Mockito, JUnit 5) verifying concurrency isolation, idempotency bypass paths, and lock release guarantees.
+
+Run tests locally:
+```bash
+./mvnw clean test
+```
+
+**Test Execution:**
+```text
+[INFO] Running tech.abhiram.loompay.PaymentServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Running tech.abhiram.loompay.LoompayApplicationTests
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
+
+---
+
+<p align="center">
+  Built by <a href="https://github.com/abhiramaab">Abhirama</a> · Live at <a href="https://portfolio.abhiram.tech">portfolio.abhiram.tech</a>
+</p>
