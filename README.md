@@ -1,7 +1,10 @@
 <p align="center">
   <a href="https://loompay.abhiram.tech">
-    <img src="./assets/loompay-logo-dark.svg#gh-dark-mode-only" alt="LoomPay" width="300" />
-    <img src="./assets/loompay-logo-light.svg#gh-light-mode-only" alt="LoomPay" width="300" />
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/abhiramaab/loompay/main/assets/loompay-logo-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/abhiramaab/loompay/main/assets/loompay-logo-light.svg">
+      <img src="https://raw.githubusercontent.com/abhiramaab/loompay/main/assets/loompay-logo-dark.svg" alt="LoomPay" width="300">
+    </picture>
   </a>
 </p>
 
