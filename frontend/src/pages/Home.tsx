@@ -1,20 +1,33 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion'
-import { LoomPayLogo, LoomPayMark } from '@/brand/Logo'
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
+import { LoomPayLogo } from '@/brand/Logo'
 import { MarketingNav } from '@/components/MarketingNav'
 import { Reveal, StaggerGroup, StaggerItem } from '@/components/Reveal'
 import { AnimatedNumber } from '@/components/AnimatedNumber'
 import { useAuth } from '@/hooks/useAuth'
-import { BUILD_CAPABILITIES, COMPLIANCES, FOOTER_COLUMNS, SOLUTIONS } from '@/lib/site'
 import {
-  ArrowRightIcon,
-  BoltIcon,
-  CheckIcon,
-  ExternalIcon,
-  LayersIcon,
-  ShieldIcon,
-} from '@/components/Icons'
+  ADAPTER_INTERFACE,
+  ARCHITECTURE_LAYERS,
+  CAPABILITIES,
+  FAILOVER_STEPS,
+  FLOW_DIAGRAM,
+  FLOW_STEPS,
+  FOOTER_LINKS,
+  LIFECYCLE_STATES,
+  LIFECYCLE_TRANSITIONS,
+  PROBLEMS,
+  RELIABILITY_FEATURES,
+  ROUTING_DEMO,
+  ROUTING_PARAMETERS,
+  ROUTING_RULES,
+  SECURITY_ITEMS,
+  SITE,
+  TECH_STACK,
+  TERMINAL_STATES,
+  USE_CASES,
+} from '@/lib/site'
+import { ArrowRightIcon, CheckIcon, ExternalIcon } from '@/components/Icons'
 import { cn } from '@/lib/utils'
 
 export function Home() {
@@ -23,16 +36,19 @@ export function Home() {
   return (
     <div id="top" className="min-h-screen bg-ink-950">
       <MarketingNav authed={isAuthenticated} />
-      <Hero authed={isAuthenticated} />
-      <LogoBand />
-      <DeployYourWay />
-      <TrustEngineered />
-      <SolutionsSection />
-      <IndustriesSection />
-      <DeveloperFirst />
-      <BuildAndScale />
-      <PricingSection />
-      <ResourcesSection />
+      <Hero />
+      <ProblemSection />
+      <CapabilitiesSection />
+      <FlowSection />
+      <RoutingSection />
+      <AdapterSection />
+      <LifecycleSection />
+      <DeveloperSection />
+      <ArchitectureSection />
+      <ReliabilitySection />
+      <ObservabilitySection />
+      <SecuritySection />
+      <UseCasesSection />
       <CTASection authed={isAuthenticated} />
       <Footer />
     </div>
@@ -41,364 +57,301 @@ export function Home() {
 
 /* ------------------------------------------------------------------ Hero */
 
-function Hero({ authed }: { authed: boolean }) {
+function Hero() {
   const ref = useRef<HTMLDivElement>(null)
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  const y = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 120])
-  const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0])
-  const scale = useTransform(scrollYProgress, [0, 1], [1, reduce ? 1 : 0.94])
+  const y = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 90])
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
 
   return (
-    <section ref={ref} className="relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28">
+    <section ref={ref} className="relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-24">
       <div className="pointer-events-none absolute inset-0 bg-grid-fade" />
       <motion.div
-        style={{ y, opacity, scale }}
+        style={{ y, opacity }}
         className="relative mx-auto w-full max-w-[1200px] px-5 sm:px-8"
       >
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mx-auto flex w-fit items-center gap-2 rounded-full border border-ink-700 bg-ink-850 px-3.5 py-1.5 shadow-card"
+          className="text-center font-mono text-2xs font-medium uppercase tracking-[0.22em] text-brand-500"
         >
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-2 w-2 animate-pulse-ring rounded-full bg-brand-500" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
-          </span>
-          <span className="text-xs font-medium text-mist-400">
-            Open source · Composable · Full-stack payment orchestration
-          </span>
-        </motion.div>
+          Payment orchestration infrastructure
+        </motion.p>
 
-        <h1 className="mx-auto mt-7 max-w-4xl text-center font-display text-[2.6rem] font-bold leading-[1.05] tracking-[-0.03em] text-mist-100 sm:text-6xl lg:text-[4.2rem]">
-          {['Composable,', 'Open Source Payments.'].map((line, i) => (
-            <motion.span
-              key={line}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-              className="block"
-            >
-              {i === 1 ? (
-                <span className="text-gradient">Open Source Payments.</span>
-              ) : (
-                line
-              )}
-            </motion.span>
-          ))}
+        <h1 className="mx-auto mt-5 max-w-4xl text-center font-display text-[2.5rem] font-bold leading-[1.08] tracking-[-0.03em] text-mist-100 sm:text-6xl lg:text-[4rem]">
+          <motion.span
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="block"
+          >
+            One payment integration.
+          </motion.span>
+          <motion.span
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className="block text-gradient"
+          >
+            Every provider under control.
+          </motion.span>
         </h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45 }}
+          transition={{ duration: 0.6, delay: 0.36 }}
           className="mx-auto mt-7 max-w-2xl text-center text-base leading-relaxed text-mist-400 sm:text-lg"
         >
-          Build or enhance your payments stack while keeping control — with an open-source,
-          full-stack, modular infrastructure. Idempotent writes, distributed locks, and a
-          double-entry ledger, in one control plane.
+          LoomPay is a payment orchestration layer that connects your application to multiple
+          payment providers through a unified API — with routing, idempotent writes, and complete
+          transaction visibility.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55 }}
+          transition={{ duration: 0.6, delay: 0.46 }}
           className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
-          <Link to={authed ? '/dashboard' : '/login'} className="btn-primary w-full sm:w-auto">
-            {authed ? 'Open the console' : 'Get started'}
+          <a href={SITE.docs} className="btn-primary w-full sm:w-auto">
+            Explore documentation
             <ArrowRightIcon className="h-4 w-4" />
-          </Link>
-          <a href="#open-source" className="btn-ghost w-full sm:w-auto">
-            Deploy open source
+          </a>
+          <a
+            href={SITE.repo}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-ghost w-full sm:w-auto"
+          >
+            View on GitHub
+            <ExternalIcon className="h-4 w-4" />
           </a>
         </motion.div>
 
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="mt-6 text-center font-mono text-2xs tracking-wide text-mist-500"
+        >
+          Unified API · Idempotency · Partition Routing · Ledger · Observability
+        </motion.p>
+
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 26 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mt-16 max-w-5xl"
         >
-          <HeroConsole />
+          <OrchestrationDiagram />
         </motion.div>
       </motion.div>
     </section>
   )
 }
 
-function HeroConsole() {
-  const rows = [
-    { id: 'ord_7f2a91c4', merchant: 'merchant_nova', amount: '₹1,50,000', status: 'SUCCESS', tone: 'mint' },
-    { id: 'ord_2b8e04dd', merchant: 'merchant_atlas', amount: '$2,500.00', status: 'PROCESSING', tone: 'brand' },
-    { id: 'ord_9c1d55a0', merchant: 'merchant_orbit', amount: '€980.00', status: 'CREATED', tone: 'neutral' },
+/**
+ * Hero visual: the request path through the orchestration layer to providers.
+ * Deliberately schematic — labels match real components in the codebase.
+ */
+function OrchestrationDiagram() {
+  const providers = ['Provider A', 'Provider B', 'Provider C']
+  const labels = [
+    { text: 'Route', x: '30%' },
+    { text: 'Retry', x: '50%' },
+    { text: 'Failover', x: '70%' },
+    { text: 'Monitor', x: '88%' },
   ]
 
   return (
-    <div className="card overflow-hidden !rounded-3xl shadow-lift">
-      <div className="flex items-center gap-2 border-b border-ink-700 bg-ink-850 px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-rosex-400" />
-        <span className="h-2.5 w-2.5 rounded-full bg-amberx-400" />
-        <span className="h-2.5 w-2.5 rounded-full bg-mint-400" />
-        <div className="ml-3 flex-1 rounded-md bg-ink-750 px-3 py-1 text-center font-mono text-2xs text-mist-500">
-          console.loompay.io/payments
-        </div>
-      </div>
+    <div className="card relative overflow-hidden !rounded-3xl p-6 shadow-lift sm:p-10">
+      <div className="pointer-events-none absolute inset-0 bg-brand-soft opacity-40" />
+      <svg viewBox="0 0 900 360" className="relative h-auto w-full" role="img" aria-label="LoomPay orchestration architecture">
+        <defs>
+          <linearGradient id="hero-line" x1="0" y1="0" x2="1" y2="0">
+            <stop stopColor="#007aff" />
+            <stop offset="1" stopColor="#5ac8fa" />
+          </linearGradient>
+          <marker id="hero-arrow" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#007aff" />
+          </marker>
+        </defs>
 
-      <div className="grid gap-4 bg-ink-900 p-4 sm:grid-cols-3 sm:p-5">
-        {[
-          { label: 'Volume settled', value: 124800000, fmt: 'inr', tone: 'text-mint-500' },
-          { label: 'Processing', value: 3, fmt: 'int', tone: 'text-brand-500' },
-          { label: 'Success rate', value: 99.4, fmt: 'pct', tone: 'text-mist-100' },
-        ].map((m, i) => (
-          <motion.div
-            key={m.label}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 + i * 0.12 }}
-            className="rounded-2xl border border-ink-700 bg-ink-800 p-4"
-          >
-            <p className="text-2xs uppercase tracking-wider text-mist-500">{m.label}</p>
-            <p className={cn('mt-1.5 font-display text-xl font-bold', m.tone)}>
-              <AnimatedNumber
-                value={m.value}
-                format={(v) =>
-                  m.fmt === 'inr'
-                    ? `₹${(v / 100000).toFixed(1)}L`
-                    : m.fmt === 'pct'
-                      ? `${v.toFixed(1)}%`
-                      : String(Math.round(v))
-                }
-              />
-            </p>
-          </motion.div>
+        {/* Application node */}
+        <motion.g
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+        >
+          <rect x="360" y="6" width="180" height="40" rx="10" className="fill-ink-800" stroke="#d5d6de" />
+          <text x="450" y="31" textAnchor="middle" className="fill-mist-100 font-mono" style={{ fontSize: 12 }}>
+            Application
+          </text>
+        </motion.g>
+
+        {/* Request flow arrow */}
+        <motion.line
+          x1="450"
+          y1="46"
+          x2="450"
+          y2="92"
+          stroke="url(#hero-line)"
+          strokeWidth="2"
+          markerEnd="url(#hero-arrow)"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 0.5, delay: 0.85 }}
+        />
+
+        {/* LoomPay layer */}
+        <motion.g
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.95 }}
+        >
+          <rect x="250" y="94" width="400" height="76" rx="14" className="fill-brand-500" />
+          <text x="450" y="123" textAnchor="middle" className="fill-white font-display" style={{ fontSize: 17, fontWeight: 700 }}>
+            LoomPay
+          </text>
+          <text x="450" y="145" textAnchor="middle" className="fill-white/75 font-mono" style={{ fontSize: 10, letterSpacing: '0.14em' }}>
+            ORCHESTRATION LAYER
+          </text>
+        </motion.g>
+
+        {/* Fan-out lines */}
+        {[150, 450, 750].map((cx, i) => (
+          <motion.path
+            key={cx}
+            d={`M450 170 C450 205, ${cx} 200, ${cx} 232`}
+            fill="none"
+            stroke="#007aff"
+            strokeOpacity="0.4"
+            strokeWidth="1.5"
+            markerEnd="url(#hero-arrow)"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 1.1 + i * 0.1 }}
+          />
         ))}
 
-        <div className="overflow-hidden rounded-2xl border border-ink-700 bg-ink-800 sm:col-span-3">
-          {rows.map((r, i) => (
-            <motion.div
-              key={r.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.15 + i * 0.12 }}
-              className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-ink-700/70 px-4 py-3 last:border-0 sm:grid-cols-3"
+        {/* Provider nodes */}
+        {providers.map((p, i) => {
+          const cx = [150, 450, 750][i]
+          return (
+            <motion.g
+              key={p}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1.35 + i * 0.1 }}
             >
-              <span className="font-mono text-xs text-mist-300">{r.id}</span>
-              <span className="hidden text-xs text-mist-500 sm:block">{r.merchant}</span>
-              <div className="flex items-center justify-end gap-3">
-                <span className="font-mono text-xs text-mist-100">{r.amount}</span>
-                <span
-                  className={cn(
-                    'chip',
-                    r.tone === 'mint'
-                      ? 'border-mint-500/30 bg-mint-500/10 text-mint-500'
-                      : r.tone === 'brand'
-                        ? 'border-brand-500/30 bg-brand-500/10 text-brand-600'
-                        : 'border-ink-600 bg-ink-750 text-mist-400',
-                  )}
-                >
-                  {r.status}
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              <rect x={cx - 85} y="234" width="170" height="48" rx="10" className="fill-ink-800" stroke="#d5d6de" />
+              <circle cx={cx - 65} cy="258" r="4" fill="#007aff" />
+              <text x={cx + 4} y="262" textAnchor="middle" className="fill-mist-200 font-mono" style={{ fontSize: 11 }}>
+                {p}
+              </text>
+              <text x={cx} y="306" textAnchor="middle" className="fill-mist-500 font-mono" style={{ fontSize: 9, letterSpacing: '0.12em' }}>
+                PAYMENTS
+              </text>
+            </motion.g>
+          )
+        })}
+      </svg>
+
+      {/* Small operational labels */}
+      <div className="relative mt-2 hidden grid-cols-4 gap-2 sm:grid">
+        {labels.map((l, i) => (
+          <motion.div
+            key={l.text}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.6 + i * 0.1 }}
+            className="rounded-lg border border-ink-700 bg-ink-800 px-3 py-2 text-center"
+          >
+            <span className="font-mono text-2xs uppercase tracking-wider text-mist-400">
+              {l.text}
+            </span>
+          </motion.div>
+        ))}
       </div>
     </div>
   )
 }
 
-/* ------------------------------------------------------------- Logo band */
+/* --------------------------------------------------------------- Problem */
 
-function LogoBand() {
-  const companies = ['Northwind', 'Atlas', 'Vertex', 'Lumen', 'Kepler', 'Meridian', 'Reload', 'Narvar']
+function ProblemSection() {
   return (
-    <section className="border-y border-ink-700/60 bg-ink-900 py-10">
-      <p className="text-center text-2xs font-medium uppercase tracking-[0.2em] text-mist-500">
-        Trusted by the fastest growing businesses globally
-      </p>
-      <div className="relative mt-6 overflow-hidden">
-        <div className="flex w-max animate-marquee items-center gap-14 px-7">
-          {[...companies, ...companies].map((c, i) => (
-            <span
-              key={`${c}-${i}`}
-              className="whitespace-nowrap font-display text-xl font-semibold tracking-tight text-mist-600"
-            >
-              {c}
-            </span>
-          ))}
-        </div>
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-ink-900 to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-ink-900 to-transparent" />
-      </div>
-    </section>
-  )
-}
-
-/* ------------------------------------------------------- Deploy your way */
-
-function DeployYourWay() {
-  return (
-    <section className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
-      <Reveal>
-        <p className="label">Deployment</p>
-        <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
-          Maintain control. Deploy your way.
-        </h2>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
-          Deploy anywhere — cloud or on-prem — and self-manage the infrastructure, or use a
-          fully managed service with out-of-the-box compliance and enterprise SLAs.
-        </p>
-      </Reveal>
-
-      <div className="mt-14 grid gap-6 lg:grid-cols-2">
-        {[
-          {
-            title: 'Self-host (on-prem / cloud)',
-            body: 'Run the orchestrator, ledger, and outbox publisher on your own infrastructure. Inspect every line and own your data.',
-            points: ['Docker-compose local setup', 'Postgres + Redis backing', 'No vendor lock-in'],
-            icon: LayersIcon,
-          },
-          {
-            title: 'Hosted by LoomPay',
-            body: 'Consume the engine as APIs and SDKs with managed infrastructure, compliance, and enterprise-grade SLAs.',
-            points: ['Managed Postgres + Redis', '99.99% uptime target', 'Support and upgrades included'],
-            icon: BoltIcon,
-          },
-        ].map((card, i) => (
-          <Reveal key={card.title} delay={i * 0.12}>
-            <div className="card card-hover flex h-full flex-col p-7">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-brand-500/25 bg-brand-500/10 text-brand-500">
-                <card.icon className="h-5 w-5" />
-              </div>
-              <h3 className="mt-5 font-display text-xl font-semibold text-mist-100">
-                {card.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-mist-400">{card.body}</p>
-              <ul className="mt-5 space-y-2.5">
-                {card.points.map((p) => (
-                  <li key={p} className="flex items-center gap-2.5 text-sm text-mist-300">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mint-500/15 text-mint-500">
-                      <CheckIcon className="h-3 w-3" />
-                    </span>
-                    {p}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-/* ------------------------------------------------------- Trust engineered */
-
-function TrustEngineered() {
-  const stats = [
-    { value: '100%', label: 'Open source' },
-    { value: '99.99', label: 'Uptime target', suffix: '%' },
-    { value: '2000', label: 'TPS traffic spike' },
-    { value: '3', label: 'PSP/acquirer rails' },
-  ]
-  return (
-    <section id="open-source" className="border-y border-ink-700/60 bg-ink-900 py-24 sm:py-28">
+    <section className="border-t border-ink-700/60 bg-ink-900 py-24 sm:py-32">
       <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
         <Reveal>
-          <p className="label">Trust engineered</p>
+          <p className="label">The problem</p>
           <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
-            Trust engineered in every line of code
+            Payments get complicated when you add more providers.
           </h2>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
+            Integrating a single payment provider is straightforward. Operating several of them is
+            not.
+          </p>
         </Reveal>
 
-        <StaggerGroup className="mt-12 grid grid-cols-2 gap-5 lg:grid-cols-4">
-          {stats.map((s) => (
-            <StaggerItem key={s.label}>
-              <div className="card h-full p-6 text-left">
-                <p className="font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-4xl">
-                  {s.value}
-                  {s.suffix && <span className="text-brand-500">{s.suffix}</span>}
-                </p>
-                <p className="mt-2 text-xs font-medium uppercase tracking-wider text-mist-500">
-                  {s.label}
-                </p>
+        <StaggerGroup className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-ink-700 bg-ink-700 sm:grid-cols-2 lg:grid-cols-4">
+          {PROBLEMS.map((p, i) => (
+            <StaggerItem key={p.title} className="bg-ink-850">
+              <div className="h-full p-6">
+                <span className="font-mono text-2xs text-mist-500">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3 className="mt-3 font-display text-base font-semibold text-mist-100">
+                  {p.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-mist-400">{p.body}</p>
               </div>
             </StaggerItem>
           ))}
         </StaggerGroup>
 
         <Reveal delay={0.1}>
-          <div className="mt-10 flex flex-wrap items-center gap-3">
-            <span className="text-xs font-medium uppercase tracking-wider text-mist-500">
-              Globally compliant
-            </span>
-            {COMPLIANCES.map((c) => (
-              <div
-                key={c.label}
-                className="flex items-center gap-2 rounded-xl border border-ink-700 bg-ink-800 px-3.5 py-2"
-              >
-                <ShieldIcon className="h-4 w-4 text-brand-500" />
-                <span className="text-xs font-semibold text-mist-200">{c.label}</span>
-                <span className="text-2xs text-mist-500">{c.sub}</span>
-              </div>
-            ))}
-          </div>
+          <p className="mt-10 text-center font-display text-lg font-medium text-mist-300">
+            LoomPay puts that complexity behind one orchestration layer.
+          </p>
         </Reveal>
       </div>
     </section>
   )
 }
 
-/* ------------------------------------------------------------- Solutions */
+/* ----------------------------------------------------------- Capabilities */
 
-function SolutionsSection() {
+function CapabilitiesSection() {
   return (
-    <section id="solutions" className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
+    <section id="orchestration" className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
       <Reveal>
-        <p className="label">Modular solutions</p>
+        <p className="label">What LoomPay does</p>
         <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
-          Independent, open source and composable payments
+          Your payment stack, behind one API.
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
-          Engineered to put control back in your hands. Pick the modules you need — plug and
-          play — and compose the rest around them.
+          Integrate once. Connect multiple providers. Control how every transaction flows.
         </p>
       </Reveal>
 
-      <StaggerGroup className="mt-14 grid gap-5 md:grid-cols-2">
-        {SOLUTIONS.map((s, i) => (
-          <StaggerItem key={s.id} className={i === 0 ? 'md:col-span-2' : ''}>
-            <article
-              id={s.id}
-              className={cn(
-                'card card-hover group flex h-full flex-col p-7',
-                i === 0 && 'md:flex-row md:items-center md:gap-10',
-              )}
-            >
-              <div className={cn(i === 0 && 'md:flex-1')}>
-                <span className="label">{s.eyebrow}</span>
-                <h3 className="mt-2 font-display text-xl font-semibold text-mist-100">
-                  {s.title}
-                </h3>
-                <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-mist-400">{s.body}</p>
-                <a
-                  href="#developers"
-                  className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-brand-500 transition-colors hover:text-brand-600"
-                >
-                  {s.link}
-                  <ExternalIcon className="h-3.5 w-3.5" />
-                </a>
-              </div>
-              <div
-                className={cn(
-                  'mt-6 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-brand-500/25 bg-brand-500/10 text-brand-500',
-                  i === 0 && 'md:mt-0 md:h-24 md:w-24',
+      <StaggerGroup className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {CAPABILITIES.map((cap) => (
+          <StaggerItem key={cap.id}>
+            <article className="card card-hover flex h-full flex-col p-6">
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-display text-lg font-semibold text-mist-100">{cap.title}</h3>
+                {cap.roadmap && (
+                  <span className="chip shrink-0 border-amberx-500/30 bg-amberx-500/10 text-amberx-500">
+                    Roadmap
+                  </span>
                 )}
-              >
-                <s.icon className={cn('h-6 w-6', i === 0 && 'md:h-10 md:w-10')} />
               </div>
+              <p className="mt-2.5 flex-1 text-sm leading-relaxed text-mist-400">{cap.body}</p>
+              <p className="mt-5 font-mono text-2xs text-mist-500">{cap.detail}</p>
             </article>
           </StaggerItem>
         ))}
@@ -407,447 +360,386 @@ function SolutionsSection() {
   )
 }
 
-/* ------------------------------------------------------------ Industries */
+/* ------------------------------------------------------------------ Flow */
 
-function IndustriesSection() {
-  const industries = [
-    {
-      id: 'industry-isf',
-      name: 'Infrastructure, SaaS & Fintech',
-      body: 'Banking-grade compliance at developer speed. Ship subscription billing, usage metering, and payouts on one ledger.',
-      icon: LayersIcon,
-      stat: 'PCI DSS · SOC 2',
-    },
-    {
-      id: 'industry-banks',
-      name: 'Banks',
-      body: 'Ledger-grade primitives for regulated entities, with immutable journal entries and deterministic reconciliation.',
-      icon: ShieldIcon,
-      stat: 'On-prem deployable',
-    },
-    {
-      id: 'industry-airlines',
-      name: 'Airlines',
-      body: 'High-volume authorization and settlement, with rate protection and consistent routing across acquirer rails.',
-      icon: BoltIcon,
-      stat: '2000 TPS spikes',
-    },
-  ]
-
+function FlowSection() {
   return (
-    <section id="industries" className="border-y border-ink-700/60 bg-ink-900 py-24 sm:py-28">
+    <section className="border-t border-ink-700/60 bg-ink-900 py-24 sm:py-32">
       <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
         <Reveal>
-          <p className="label">Industries</p>
+          <p className="label">How it works</p>
           <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
-            Powering payments across industries
+            From payment request to recorded transaction.
           </h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
-            From banking-grade compliance to airline-scale volumes, LoomPay adapts to the rules
-            your industry plays by.
-          </p>
         </Reveal>
 
-        <StaggerGroup className="mt-12 grid gap-5 md:grid-cols-3">
-          {industries.map((ind) => (
-            <StaggerItem key={ind.id}>
-              <article id={ind.id} className="card card-hover flex h-full flex-col p-6">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-brand-500/25 bg-brand-500/10 text-brand-500">
-                  <ind.icon className="h-5 w-5" />
+        <div className="mt-14 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+          <div className="flex flex-col gap-px overflow-hidden rounded-2xl border border-ink-700 bg-ink-700">
+            {FLOW_STEPS.map((step, i) => (
+              <Reveal key={step.step} delay={i * 0.05}>
+                <div className="flex gap-5 bg-ink-850 p-6">
+                  <span className="font-display text-2xl font-bold text-brand-500">{step.step}</span>
+                  <div>
+                    <p className="font-mono text-2xs uppercase tracking-[0.16em] text-mist-300">
+                      {step.key}
+                    </p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-mist-400">{step.body}</p>
+                  </div>
                 </div>
-                <h3 className="mt-5 font-display text-lg font-semibold text-mist-100">
-                  {ind.name}
-                </h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-mist-400">{ind.body}</p>
-                <span className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full border border-ink-600 bg-ink-750 px-3 py-1 text-2xs font-medium text-mist-400">
-                  <CheckIcon className="h-3 w-3 text-mint-500" />
-                  {ind.stat}
-                </span>
-              </article>
-            </StaggerItem>
-          ))}
-        </StaggerGroup>
-      </div>
-    </section>
-  )
-}
-
-/* --------------------------------------------------------- Developer first */
-
-function DeveloperFirst() {
-  const code = `POST /api/v1/payments
-X-Merchant-Id: merchant_123
-
-{
-  "merchantId": "merchant_123",
-  "amount": 150000,
-  "currency": "INR",
-  "idempotencyKey": "idem_9f2c1a7b3d4e5f60"
-}`
-
-  return (
-    <section id="developers" className="border-y border-ink-700/60 bg-ink-900 py-24 sm:py-32">
-      <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
-        <Reveal>
-          <p className="label">Developer first</p>
-          <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
-            Everything you need for whatever you build
-          </h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
-            Developer-first APIs to build a scalable payments stack from the ground up using
-            the modules of your choice. Plug and play.
-          </p>
-        </Reveal>
-
-        <div className="mt-14 grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-          <Reveal delay={0.1}>
-            <div className="card overflow-hidden !rounded-2xl shadow-lift">
-              <div className="flex items-center justify-between border-b border-ink-700 bg-ink-850 px-4 py-3">
-                <span className="font-mono text-2xs text-mist-500">request</span>
-                <span className="chip border-brand-500/30 bg-brand-500/10 text-brand-600">
-                  idempotent
-                </span>
-              </div>
-              <pre className="overflow-x-auto bg-ink-800 px-5 py-5 font-mono text-xs leading-relaxed text-mist-300">
-                {code}
-              </pre>
-              <div className="flex items-center justify-between border-t border-ink-700 bg-ink-850 px-4 py-3">
-                <span className="font-mono text-2xs text-mist-500">201 Created</span>
-                <span className="font-mono text-2xs text-mint-500">ord_020761b0c3ef</span>
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal>
-            <div className="flex flex-wrap gap-2">
-              {[
-                'REST',
-                'Idempotency-Key',
-                'HTTP 429',
-                'Outbox events',
-                'Signed webhooks',
-                'Docker',
-                'Postgres',
-                'Redis',
-              ].map((tag) => (
-                <span key={tag} className="chip border-ink-600 bg-ink-850 text-mist-400">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <p className="mt-6 text-base leading-relaxed text-mist-400">
-              Predictable REST semantics, explicit state transitions, and idempotency keys that
-              make retries safe by construction. Ship an integration in an afternoon.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link to="/login" className="btn-primary">
-                Get API access
-                <ArrowRightIcon className="h-4 w-4" />
-              </Link>
-              <a href="#open-source" className="btn-ghost">
-                Read the docs
-              </a>
-            </div>
-          </Reveal>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* --------------------------------------------------------- Build and scale */
-
-function BuildAndScale() {
-  const ref = useRef<HTMLDivElement>(null)
-  const reduce = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
-  const rotate = useSpring(useTransform(scrollYProgress, [0, 1], [reduce ? 0 : -7, 7]), {
-    stiffness: 80,
-    damping: 20,
-  })
-
-  const nodes = [
-    { label: 'API Gateway', x: '12%', y: '18%' },
-    { label: 'Idempotency', x: '50%', y: '8%' },
-    { label: 'Rate Limiter', x: '88%', y: '18%' },
-    { label: 'Lock Manager', x: '22%', y: '52%' },
-    { label: 'Ledger', x: '50%', y: '44%' },
-    { label: 'Outbox', x: '78%', y: '52%' },
-    { label: 'Reconciler', x: '50%', y: '84%' },
-  ]
-  const connections: [number, number][] = [
-    [0, 1],
-    [0, 3],
-    [1, 2],
-    [1, 4],
-    [2, 5],
-    [3, 4],
-    [4, 5],
-    [5, 6],
-    [3, 6],
-  ]
-
-  return (
-    <section id="architecture" className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
-      <Reveal>
-        <p className="label">Build &amp; scale</p>
-        <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
-          Build and scale your payment strategy
-        </h2>
-      </Reveal>
-
-      <div className="mt-14 grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
-        <div className="flex flex-col gap-5">
-          {BUILD_CAPABILITIES.map((c, i) => (
-            <Reveal key={c.title} delay={i * 0.06}>
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand-500/25 bg-brand-500/10 font-display text-sm font-bold text-brand-500">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  {i < BUILD_CAPABILITIES.length - 1 && (
-                    <span className="mt-1 w-px flex-1 bg-ink-700" />
-                  )}
-                </div>
-                <div className="pb-2">
-                  <h3 className="font-display text-lg font-semibold text-mist-100">{c.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-mist-400">{c.body}</p>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <motion.div
-          ref={ref}
-          style={{ rotateX: rotate, transformPerspective: 1200 }}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="card relative aspect-[16/12] overflow-hidden !rounded-3xl bg-ink-900 shadow-lift lg:aspect-[16/13]"
-        >
-          <div
-            className="absolute inset-0 opacity-60"
-            style={{
-              backgroundImage:
-                'radial-gradient(circle at 1px 1px, rgba(0,122,255,0.14) 1px, transparent 0)',
-              backgroundSize: '28px 28px',
-            }}
-          />
-          <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
-            {connections.map(([a, b], i) => (
-              <motion.line
-                key={`${a}-${b}`}
-                x1={nodes[a].x}
-                y1={nodes[a].y}
-                x2={nodes[b].x}
-                y2={nodes[b].y}
-                stroke="#007AFF"
-                strokeOpacity="0.22"
-                strokeWidth="1.5"
-                initial={{ pathLength: 0 }}
-                whileInView={{ pathLength: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.2 + i * 0.1 }}
-              />
+              </Reveal>
             ))}
-          </svg>
-          {nodes.map((n, i) => (
-            <motion.div
-              key={n.label}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ delay: 0.15 + i * 0.08, type: 'spring', stiffness: 260, damping: 22 }}
-              style={{ left: n.x, top: n.y }}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
-            >
-              <div className="flex items-center gap-2 rounded-xl border border-ink-700 bg-ink-850 px-3.5 py-2 shadow-card">
-                <span className="h-2 w-2 rounded-full bg-brand-500" />
-                <span className="whitespace-nowrap text-xs font-medium text-mist-200">
-                  {n.label}
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+          </div>
+
+          <Reveal delay={0.1}>
+            <FlowDiagram />
+          </Reveal>
+        </div>
       </div>
     </section>
   )
 }
 
-/* ------------------------------------------------------------- Pricing */
-
-function PricingSection() {
-  const tiers = [
-    {
-      name: 'Open Source',
-      price: 'Free',
-      period: 'forever',
-      body: 'Self-host the full engine and own your infrastructure.',
-      points: ['Unlimited orders', 'Double-entry ledger', 'Redis locks & rate limits', 'Community support'],
-      cta: 'Deploy open source',
-      primary: false,
-    },
-    {
-      name: 'Growth',
-      price: '$0.04',
-      period: 'per transaction',
-      body: 'Managed infrastructure with compliance and SLAs.',
-      points: ['Managed Postgres + Redis', '99.99% uptime SLA', 'Webhook retries & outbox', 'Priority support'],
-      cta: 'Get started',
-      primary: true,
-    },
-    {
-      name: 'Enterprise',
-      price: 'Custom',
-      period: "let's talk",
-      body: 'For regulated entities and high-volume processors.',
-      points: ['PCI DSS & SOC 2 reports', 'Dedicated infrastructure', 'On-prem or private cloud', 'Named solutions team'],
-      cta: 'Contact sales',
-      primary: false,
-    },
-  ]
-
+function FlowDiagram() {
   return (
-    <section id="pricing" className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
+    <div className="card sticky top-24 p-6">
+      <p className="label mb-5">Request path</p>
+      <div className="flex flex-col">
+        {FLOW_DIAGRAM.map((node, i) => (
+          <div key={node} className="flex flex-col items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.4, delay: i * 0.09 }}
+              className="w-full rounded-xl border border-ink-700 bg-ink-800 px-4 py-3 text-center"
+            >
+              <span className="font-mono text-xs text-mist-200">{node}</span>
+            </motion.div>
+            {i < FLOW_DIAGRAM.length - 1 && (
+              <motion.div
+                initial={{ scaleY: 0 }}
+                whileInView={{ scaleY: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.25, delay: i * 0.09 + 0.05 }}
+                className="my-1 h-5 w-px origin-top bg-brand-500/50"
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* --------------------------------------------------------------- Routing */
+
+function RoutingSection() {
+  return (
+    <section id="routing" className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
       <Reveal>
-        <p className="label">Pricing</p>
+        <p className="label">Routing</p>
         <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
-          Start free. Scale when you do.
+          Control how payments are routed.
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
-          Transparent pricing with no lock-in. Self-host for free, or let us run the
-          infrastructure for you.
+          LoomPay assigns traffic deterministically so partitions stay balanced and rehashing stays
+          cheap when the ring changes.
         </p>
       </Reveal>
 
       <div className="mt-14 grid gap-6 lg:grid-cols-3">
-        {tiers.map((tier, i) => (
-          <Reveal key={tier.name} delay={i * 0.1}>
-            <div
-              className={cn(
-                'card relative flex h-full flex-col p-7',
-                tier.primary && 'border-brand-500/40 shadow-glow',
-              )}
-            >
-              {tier.primary && (
-                <span className="absolute -top-3 left-7 rounded-full border border-brand-500/30 bg-brand-soft px-3 py-1 text-2xs font-semibold text-brand-600">
-                  Most popular
-                </span>
-              )}
-              <p className="font-display text-lg font-semibold text-mist-100">{tier.name}</p>
-              <div className="mt-4 flex items-baseline gap-2">
-                <span className="font-display text-3xl font-bold tracking-tight text-mist-100">
-                  {tier.price}
-                </span>
-                <span className="text-xs text-mist-500">{tier.period}</span>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-mist-400">{tier.body}</p>
-              <ul className="mt-6 flex-1 space-y-2.5">
-                {tier.points.map((p) => (
-                  <li key={p} className="flex items-center gap-2.5 text-sm text-mist-300">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mint-500/15 text-mint-500">
-                      <CheckIcon className="h-3 w-3" />
-                    </span>
-                    {p}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                to="/login"
-                className={cn('mt-7 w-full', tier.primary ? 'btn-primary' : 'btn-ghost')}
-              >
-                {tier.cta}
-              </Link>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-/* ----------------------------------------------------------- Resources */
-
-function ResourcesSection() {
-  const items = [
-    {
-      tag: 'Blog',
-      title: 'Designing idempotency that survives concurrent retries',
-      read: '6 min read',
-    },
-    {
-      tag: 'Case study',
-      title: 'How a marketplace cut duplicate charges to zero',
-      read: '4 min read',
-    },
-    {
-      tag: 'Release notes',
-      title: 'Transactional outbox and the reconciliation worker',
-      read: '3 min read',
-    },
-  ]
-  return (
-    <section id="resources" className="border-y border-ink-700/60 bg-ink-900 py-24 sm:py-32">
-      <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
-        <Reveal>
-          <p className="label">Resources</p>
-          <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
-            Learn how teams ship on LoomPay
-          </h2>
+        <Reveal className="lg:col-span-2">
+          <HashRingVisual />
         </Reveal>
 
-        <StaggerGroup className="mt-12 grid gap-5 md:grid-cols-3">
-          {items.map((item) => (
-            <StaggerItem key={item.title}>
-              <article className="card card-hover group flex h-full flex-col p-6">
-                <span className="chip w-fit border-brand-500/25 bg-brand-500/10 text-brand-600">
-                  {item.tag}
-                </span>
-                <h3 className="mt-4 font-display text-lg font-semibold leading-snug text-mist-100">
-                  {item.title}
-                </h3>
-                <div className="mt-auto flex items-center justify-between pt-6 text-xs text-mist-500">
-                  <span>{item.read}</span>
-                  <ExternalIcon className="h-4 w-4 text-mist-600 transition-colors group-hover:text-brand-500" />
+        <Reveal delay={0.1}>
+          <div className="card flex h-full flex-col p-6">
+            <p className="label">Routing inputs</p>
+            <ul className="mt-4 space-y-3">
+              {ROUTING_PARAMETERS.map((p) => (
+                <li key={p} className="flex items-start gap-2.5 text-sm text-mist-300">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-500">
+                    <CheckIcon className="h-3 w-3" />
+                  </span>
+                  {p}
+                </li>
+              ))}
+            </ul>
+
+            <p className="label mt-7">Behaviour</p>
+            <ul className="mt-4 space-y-2">
+              {ROUTING_RULES.map((r) => (
+                <li key={r} className="font-mono text-2xs leading-relaxed text-mist-500">
+                  · {r}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
+      </div>
+
+      <Reveal delay={0.1}>
+        <div className="card mt-6 p-6">
+          <div className="flex items-center justify-between">
+            <p className="label">Partition distribution</p>
+            <span className="chip border-amberx-500/30 bg-amberx-500/10 text-amberx-500">
+              demo data
+            </span>
+          </div>
+          <div className="mt-5 grid gap-5 sm:grid-cols-3">
+            {ROUTING_DEMO.map((m, i) => (
+              <div key={m.label}>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs font-medium text-mist-300">{m.label}</span>
+                  <span className="font-mono text-xs text-mist-200">{m.value}%</span>
                 </div>
-              </article>
-            </StaggerItem>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-ink-750">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${m.value}%` }}
+                    viewport={{ once: true, margin: '-60px' }}
+                    transition={{ duration: 0.9, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                    className="h-full rounded-full bg-gradient-to-r from-brand-500 to-cyanx-400"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-2xs text-mist-500">
+            Illustrative values for layout only — not live production metrics.
+          </p>
+        </div>
+      </Reveal>
+    </section>
+  )
+}
+
+function HashRingVisual() {
+  const reduce = useReducedMotion()
+  const nodes = [0, 60, 130, 205, 275, 330]
+  return (
+    <div className="card h-full p-6">
+      <p className="label">Consistent hash ring</p>
+      <div className="mt-4 grid items-center gap-6 sm:grid-cols-[auto_1fr]">
+        <svg viewBox="0 0 200 200" className="mx-auto h-48 w-48" role="img" aria-label="Hash ring">
+          <defs>
+            <linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop stopColor="#007aff" />
+              <stop offset="1" stopColor="#5ac8fa" />
+            </linearGradient>
+          </defs>
+          <circle cx="100" cy="100" r="72" fill="none" stroke="#e5e6ec" strokeWidth="1.5" />
+          {!reduce &&
+            nodes.map((deg, i) => (
+              <motion.circle
+                key={deg}
+                cx={100 + 72 * Math.cos((deg * Math.PI) / 180)}
+                cy={100 + 72 * Math.sin((deg * Math.PI) / 180)}
+                r="6"
+                fill="#007aff"
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ delay: i * 0.08, type: 'spring', stiffness: 300, damping: 20 }}
+              />
+            ))}
+          <motion.circle
+            cx="100"
+            cy="100"
+            r="30"
+            fill="none"
+            stroke="url(#ring-grad)"
+            strokeWidth="2"
+            strokeDasharray="6 6"
+            animate={reduce ? {} : { rotate: 360 }}
+            transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+            style={{ transformOrigin: '100px 100px' }}
+          />
+          <text x="100" y="96" textAnchor="middle" className="fill-mist-400 font-mono" style={{ fontSize: 9 }}>
+            merchant key
+          </text>
+          <text x="100" y="108" textAnchor="middle" className="fill-brand-500 font-mono" style={{ fontSize: 9 }}>
+            → partition
+          </text>
+        </svg>
+
+        <div className="space-y-3">
+          {[
+            { k: 'hash(key) & MAX_VALUE', v: 'ring position' },
+            { k: 'tailMap(pos).firstKey()', v: 'target node' },
+            { k: 'virtual nodes', v: 'even distribution' },
+            { k: 'node change', v: 'minimal rehash' },
+          ].map((row) => (
+            <div
+              key={row.k}
+              className="flex flex-col gap-0.5 rounded-lg border border-ink-700 bg-ink-850 px-3.5 py-2.5 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <span className="font-mono text-2xs text-mist-300">{row.k}</span>
+              <span className="font-mono text-2xs text-mist-500">{row.v}</span>
+            </div>
           ))}
-        </StaggerGroup>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------- Adapters */
+
+function AdapterSection() {
+  return (
+    <section className="border-t border-ink-700/60 bg-ink-900 py-24 sm:py-32">
+      <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
+        <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
+          <Reveal>
+            <div className="flex items-center gap-3">
+              <p className="label">Provider adapters</p>
+              <span className="chip border-amberx-500/30 bg-amberx-500/10 text-amberx-500">
+                interface defined · roadmap
+              </span>
+            </div>
+            <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
+              Add providers without rewriting your payment layer.
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-mist-400">
+              Each payment provider speaks a different API. LoomPay normalizes those differences
+              behind a common orchestration layer.
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-mist-500">
+              Provider adapters isolate gateway-specific authentication, request formats, response
+              mapping, and webhook handling from the rest of the application. The interface is
+              defined; concrete gateway adapters are on the roadmap.
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <div className="card overflow-hidden !rounded-2xl">
+              <div className="border-b border-ink-700 bg-ink-850 px-5 py-3">
+                <span className="font-mono text-2xs uppercase tracking-wider text-mist-500">
+                  loompay core → ProviderAdapter
+                </span>
+              </div>
+              <div className="p-5">
+                <div className="space-y-2">
+                  {ADAPTER_INTERFACE.map((m) => (
+                    <div
+                      key={m.method}
+                      className="flex items-center justify-between rounded-lg border border-ink-700 bg-ink-850 px-4 py-2.5"
+                    >
+                      <span className="font-mono text-xs text-brand-500">{m.method}()</span>
+                      <span className="text-2xs text-mist-500">{m.note}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="my-4 h-px bg-ink-700" />
+                <div className="grid grid-cols-2 gap-2">
+                  {['Provider A', 'Provider B', 'Provider C', 'Add your own'].map((p, i) => (
+                    <motion.div
+                      key={p}
+                      initial={{ opacity: 0, y: 8 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.2 + i * 0.08 }}
+                      className={cn(
+                        'rounded-lg border px-3 py-2.5 text-center font-mono text-2xs',
+                        p === 'Add your own'
+                          ? 'border-dashed border-brand-500/40 text-brand-500'
+                          : 'border-ink-700 bg-ink-850 text-mist-300',
+                      )}
+                    >
+                      {p}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
       </div>
     </section>
   )
 }
 
-/* ----------------------------------------------------------------- CTA */
+/* ------------------------------------------------------------- Lifecycle */
 
-function CTASection({ authed }: { authed: boolean }) {
+function LifecycleSection() {
   return (
-    <section className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8">
+    <section id="lifecycle" className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
       <Reveal>
-        <div className="relative overflow-hidden rounded-[2rem] border border-brand-500/20 bg-brand-soft px-8 py-16 text-center shadow-lift sm:px-16 sm:py-20">
-          <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-brand-500/10 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-cyanx-400/10 blur-3xl" />
-          <div className="relative">
-            <LoomPayMark size={52} className="mx-auto" />
-            <h2 className="mx-auto mt-6 max-w-2xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.5rem] sm:leading-[1.1]">
-              Start orchestrating payments today
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-mist-400">
-              Spin up the engine, create your first order, and watch it flow through the
-              lifecycle — no credit card required.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link to={authed ? '/dashboard' : '/login'} className="btn-primary w-full sm:w-auto">
-                {authed ? 'Open the console' : 'Create your account'}
-                <ArrowRightIcon className="h-4 w-4" />
-              </Link>
-              <a href="#open-source" className="btn-ghost w-full sm:w-auto">
-                Explore the product
-              </a>
+        <p className="label">Transaction lifecycle</p>
+        <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
+          Every payment has a traceable lifecycle.
+        </h2>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
+          LoomPay maintains a normalized transaction lifecycle so provider-specific responses can be
+          represented through a consistent payment state model.
+        </p>
+      </Reveal>
+
+      <Reveal delay={0.05}>
+        <div className="mt-12 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="card p-6">
+            <p className="label mb-5">Happy path</p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+              {LIFECYCLE_STATES.map((state, i) => (
+                <div key={state} className="flex flex-1 items-center gap-3">
+                  <div className="flex-1 rounded-xl border border-ink-700 bg-ink-850 px-4 py-3 text-center">
+                    <span className="font-mono text-xs font-semibold text-mist-100">{state}</span>
+                  </div>
+                  {i < 2 && (
+                    <ArrowRightIcon className="hidden h-4 w-4 shrink-0 text-mist-600 sm:block" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <p className="label mb-5 mt-8">Transitions</p>
+            <div className="space-y-2">
+              {LIFECYCLE_TRANSITIONS.map((t, i) => (
+                <motion.div
+                  key={`${t.from}-${t.to}`}
+                  initial={{ opacity: 0, x: -8 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.07 }}
+                  className="flex flex-wrap items-center gap-2 rounded-lg border border-ink-700 bg-ink-850 px-3.5 py-2.5"
+                >
+                  <span className="font-mono text-2xs text-mist-300">{t.from}</span>
+                  <ArrowRightIcon className="h-3 w-3 text-mist-600" />
+                  <span className="font-mono text-2xs text-mist-100">{t.to}</span>
+                  <span className="ml-auto text-2xs text-mist-500">{t.note}</span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div className="card p-6">
+            <p className="label mb-5">Terminal states</p>
+            <div className="flex flex-col gap-3">
+              {TERMINAL_STATES.map((s) => (
+                <div
+                  key={s}
+                  className={cn(
+                    'rounded-xl border px-4 py-3 font-mono text-xs font-semibold',
+                    s === 'FAILED'
+                      ? 'border-rosex-500/30 bg-rosex-500/10 text-rosex-500'
+                      : 'border-amberx-500/30 bg-amberx-500/10 text-amberx-500',
+                  )}
+                >
+                  {s}
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 rounded-xl border border-ink-700 bg-ink-850 p-4">
+              <div className="flex items-center gap-2 text-mint-500">
+                <CheckIcon className="h-4 w-4" />
+                <span className="text-xs font-semibold text-mist-100">Idempotent payment requests</span>
+              </div>
+              <p className="mt-2 text-2xs leading-relaxed text-mist-500">
+                Reusing an idempotency key returns the existing order instead of creating a second
+                charge.
+              </p>
             </div>
           </div>
         </div>
@@ -856,65 +748,475 @@ function CTASection({ authed }: { authed: boolean }) {
   )
 }
 
-/* -------------------------------------------------------------- Footer */
+/* -------------------------------------------------------------- Developer */
+
+function DeveloperSection() {
+  const request = `POST /api/v1/payments
+Content-Type: application/json
+X-Merchant-Id: merchant_123
+
+{
+  "merchantId": "merchant_123",
+  "amount": 4999,
+  "currency": "INR",
+  "idempotencyKey": "idem_9f2c1a7b3d4e5f60"
+}`
+
+  const response = `201 Created
+
+{
+  "orderId": "ord_a1b2c3d4e5f6",
+  "merchantId": "merchant_123",
+  "amount": 4999,
+  "currency": "INR",
+  "status": "CREATED",
+  "createdAt": "2026-01-01T10:00:00"
+}`
+
+  return (
+    <section
+      id="developer-experience"
+      className="border-t border-ink-700/60 bg-ink-900 py-24 sm:py-32"
+    >
+      <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
+        <Reveal>
+          <p className="label">Developer experience</p>
+          <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
+            Built for developers who own the payment stack.
+          </h2>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
+            One API surface. Provider-specific complexity stays behind the orchestration layer.
+          </p>
+        </Reveal>
+
+        <div className="mt-12 grid gap-6 lg:grid-cols-2">
+          <Reveal>
+            <CodePanel title="Request" code={request} />
+          </Reveal>
+          <Reveal delay={0.08}>
+            <CodePanel title="Response" code={response} accent />
+          </Reveal>
+        </div>
+
+        <Reveal delay={0.1}>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href="#developer-experience" className="btn-primary">
+              Read the API docs
+              <ArrowRightIcon className="h-4 w-4" />
+            </a>
+            <a href="#architecture" className="btn-ghost">
+              Explore the architecture
+            </a>
+          </div>
+          <p className="mt-5 font-mono text-2xs text-mist-500">
+            GET /api/v1/payments/{'{orderId}'} · amount in minor units (paise / cents) · currency INR, USD, EUR
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  )
+}
+
+function CodePanel({ title, code, accent }: { title: string; code: string; accent?: boolean }) {
+  return (
+    <div className="card overflow-hidden !rounded-2xl">
+      <div className="flex items-center justify-between border-b border-ink-700 bg-ink-850 px-4 py-2.5">
+        <span className="font-mono text-2xs uppercase tracking-wider text-mist-500">{title}</span>
+        <span
+          className={cn(
+            'h-1.5 w-1.5 rounded-full',
+            accent ? 'bg-mint-400' : 'bg-brand-500',
+          )}
+        />
+      </div>
+      <pre className="overflow-x-auto px-5 py-4 font-mono text-xs leading-relaxed text-mist-300">
+        {code}
+      </pre>
+    </div>
+  )
+}
+
+/* ----------------------------------------------------------- Architecture */
+
+function ArchitectureSection() {
+  const stack = TECH_STACK
+  return (
+    <section id="architecture" className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
+      <Reveal>
+        <p className="label">Architecture</p>
+        <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
+          Designed as a payment infrastructure layer.
+        </h2>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
+          Each concern is isolated into a service with a single responsibility so failures stay
+          contained and recovery is deterministic.
+        </p>
+      </Reveal>
+
+      <div className="mt-12 grid gap-4 lg:grid-cols-3">
+        {ARCHITECTURE_LAYERS.map((layer, i) => (
+          <Reveal key={layer.tier} delay={i * 0.05}>
+            <div className="card h-full p-5">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-2xs uppercase tracking-wider text-brand-500">
+                  {layer.tier}
+                </span>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {layer.nodes.map((node) => (
+                  <span
+                    key={node}
+                    className="rounded-lg border border-ink-700 bg-ink-850 px-3 py-1.5 font-mono text-2xs text-mist-300"
+                  >
+                    {node}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal delay={0.1}>
+        <div className="card mt-6 p-6">
+          <p className="label">Technology</p>
+          <div className="mt-4 flex flex-wrap gap-2.5">
+            {stack.map((t) => (
+              <div
+                key={t.name}
+                className="flex items-center gap-2 rounded-xl border border-ink-700 bg-ink-850 px-3.5 py-2"
+              >
+                <span className="text-sm font-semibold text-mist-100">{t.name}</span>
+                <span className="text-2xs text-mist-500">{t.note}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------ Reliability */
+
+function ReliabilitySection() {
+  return (
+    <section className="border-t border-ink-700/60 bg-ink-900 py-24 sm:py-32">
+      <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
+        <div className="grid gap-14 lg:grid-cols-2 lg:gap-20">
+          <Reveal>
+            <p className="label">Reliability</p>
+            <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
+              Payments need graceful failure.
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-mist-400">
+              Provider failures should not force your entire payment system to fail. LoomPay keeps
+              execution serialized, records every transition, and resolves stale orders on a
+              schedule.
+            </p>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {RELIABILITY_FEATURES.map((f, i) => (
+                <Reveal key={f.title} delay={i * 0.05}>
+                  <div className="rounded-xl border border-ink-700 bg-ink-850 p-4">
+                    <p className="text-sm font-semibold text-mist-100">{f.title}</p>
+                    <p className="mt-1.5 text-2xs leading-relaxed text-mist-500">{f.body}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <div className="card p-6">
+              <p className="label mb-5">Failure handling path</p>
+              <div className="flex flex-col">
+                {FAILOVER_STEPS.map((step, i) => (
+                  <div key={step.label} className="flex flex-col items-center">
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, margin: '-60px' }}
+                      transition={{ delay: i * 0.09 }}
+                      className={cn(
+                        'flex w-full items-center justify-between rounded-xl border px-4 py-3',
+                        step.tone === 'danger'
+                          ? 'border-rosex-500/30 bg-rosex-500/10'
+                          : step.tone === 'mint'
+                            ? 'border-mint-500/30 bg-mint-500/10'
+                            : step.tone === 'brand'
+                              ? 'border-brand-500/25 bg-brand-500/10'
+                              : 'border-ink-700 bg-ink-850',
+                      )}
+                    >
+                      <span className="text-xs font-semibold text-mist-100">{step.label}</span>
+                      <span className="font-mono text-2xs text-mist-500">{step.state}</span>
+                    </motion.div>
+                    {i < FAILOVER_STEPS.length - 1 && (
+                      <motion.div
+                        initial={{ scaleY: 0 }}
+                        whileInView={{ scaleY: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.2, delay: i * 0.09 + 0.05 }}
+                        className="my-1 h-4 w-px origin-top bg-ink-600"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ---------------------------------------------------------- Observability */
+
+function ObservabilitySection() {
+  const rows = [
+    { id: 'pay_8f2c91', amount: '₹1,499', status: 'SUCCESS', tone: 'mint' },
+    { id: 'pay_7c1a04', amount: '₹3,200', status: 'FAILED', tone: 'rose' },
+    { id: 'pay_6d9e73', amount: '₹799', status: 'PROCESSING', tone: 'brand' },
+  ]
+  const metrics = [
+    { label: 'Total transactions', value: 12842, fmt: (v: number) => v.toLocaleString('en-IN') },
+    { label: 'Successful', value: 11946, fmt: (v: number) => v.toLocaleString('en-IN') },
+    { label: 'Failed', value: 896, fmt: (v: number) => v.toLocaleString('en-IN') },
+    { label: 'Success rate', value: 93.0, fmt: (v: number) => `${v.toFixed(2)}%` },
+  ]
+
+  return (
+    <section className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
+      <Reveal>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="label">Observability</p>
+          <span className="chip border-amberx-500/30 bg-amberx-500/10 text-amberx-500">
+            demo data
+          </span>
+        </div>
+        <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
+          Know what happened to every transaction.
+        </h2>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
+          The console surfaces transaction status, failures, and routing decisions in one place.
+          The figures below illustrate the layout.
+        </p>
+      </Reveal>
+
+      <Reveal delay={0.08}>
+        <div className="card mt-12 overflow-hidden">
+          <div className="grid grid-cols-2 divide-ink-700 border-b border-ink-700 sm:grid-cols-4 sm:divide-x">
+            {metrics.map((m, i) => (
+              <div key={m.label} className="p-5">
+                <p className="text-2xs uppercase tracking-wider text-mist-500">{m.label}</p>
+                <p className="mt-2 font-display text-2xl font-bold text-mist-100">
+                  <AnimatedNumber value={m.value} format={m.fmt} />
+                </p>
+                {i === 3 && <span className="text-2xs text-mist-500">demo</span>}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid gap-6 p-6 lg:grid-cols-[1.2fr_0.8fr]">
+            <div>
+              <p className="label mb-3">Recent transactions</p>
+              <div className="overflow-hidden rounded-xl border border-ink-700">
+                {rows.map((r, i) => (
+                  <motion.div
+                    key={r.id}
+                    initial={{ opacity: 0, x: -8 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.08 }}
+                    className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-ink-700/70 px-4 py-3 last:border-0"
+                  >
+                    <span className="font-mono text-xs text-mist-300">{r.id}</span>
+                    <span className="font-mono text-xs text-mist-100">{r.amount}</span>
+                    <span
+                      className={cn(
+                        'chip',
+                        r.tone === 'mint'
+                          ? 'border-mint-500/30 bg-mint-500/10 text-mint-500'
+                          : r.tone === 'rose'
+                            ? 'border-rosex-500/30 bg-rosex-500/10 text-rosex-500'
+                            : 'border-brand-500/30 bg-brand-500/10 text-brand-600',
+                      )}
+                    >
+                      {r.status}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="label mb-3">Provider performance</p>
+              <div className="space-y-4">
+                {[
+                  { name: 'Provider A', value: 94.2 },
+                  { name: 'Provider B', value: 91.7 },
+                  { name: 'Provider C', value: 89.8 },
+                ].map((p, i) => (
+                  <div key={p.name}>
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-xs text-mist-300">{p.name}</span>
+                      <span className="font-mono text-xs text-mist-200">{p.value}%</span>
+                    </div>
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-ink-750">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${p.value}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.9, delay: i * 0.12 }}
+                        className="h-full rounded-full bg-brand-500"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  )
+}
+
+/* -------------------------------------------------------------- Security */
+
+function SecuritySection() {
+  return (
+    <section className="border-t border-ink-700/60 bg-ink-900 py-24 sm:py-32">
+      <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
+        <Reveal>
+          <p className="label">Security</p>
+          <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
+            Security belongs in the infrastructure.
+          </h2>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-400">
+            The guarantees below are enforced in code today — not aspirational certifications.
+          </p>
+        </Reveal>
+
+        <StaggerGroup className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {SECURITY_ITEMS.map((item) => (
+            <StaggerItem key={item.title}>
+              <div className="flex h-full gap-3 rounded-xl border border-ink-700 bg-ink-850 p-5">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mint-500/15 text-mint-500">
+                  <CheckIcon className="h-3.5 w-3.5" />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-mist-100">{item.title}</p>
+                  <p className="mt-1 text-2xs leading-relaxed text-mist-500">{item.body}</p>
+                </div>
+              </div>
+            </StaggerItem>
+          ))}
+        </StaggerGroup>
+      </div>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------- Use cases */
+
+function UseCasesSection() {
+  return (
+    <section className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
+      <Reveal>
+        <p className="label">Use cases</p>
+        <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.6rem] sm:leading-[1.1]">
+          Built for multi-provider payment stacks.
+        </h2>
+      </Reveal>
+
+      <StaggerGroup className="mt-12 grid gap-5 sm:grid-cols-2">
+        {USE_CASES.map((u) => (
+          <StaggerItem key={u.id}>
+            <article className="card card-hover h-full p-6">
+              <p className="font-display text-lg font-semibold text-mist-100">{u.title}</p>
+              <p className="mt-2 text-sm leading-relaxed text-mist-400">{u.body}</p>
+            </article>
+          </StaggerItem>
+        ))}
+      </StaggerGroup>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------- CTA */
+
+function CTASection({ authed }: { authed: boolean }) {
+  return (
+    <section className="border-t border-ink-700/60 bg-ink-900 py-24 sm:py-28">
+      <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
+        <Reveal>
+          <div className="rounded-[2rem] border border-brand-500/20 bg-brand-soft px-8 py-16 sm:px-16">
+            <h2 className="max-w-2xl font-display text-3xl font-bold tracking-tight text-mist-100 sm:text-[2.4rem] sm:leading-[1.1]">
+              Take control of your payment infrastructure.
+            </h2>
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-mist-400">
+              Integrate once. Connect your providers. Define your routing logic. Observe every
+              transaction.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link to={authed ? '/dashboard' : '/login'} className="btn-primary">
+                {authed ? 'Open the console' : 'Explore LoomPay'}
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+              <a
+                href={SITE.repo}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-ghost"
+              >
+                View GitHub
+                <ExternalIcon className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  )
+}
+
+/* ---------------------------------------------------------------- Footer */
 
 function Footer() {
-  const columns = FOOTER_COLUMNS
   return (
     <footer className="border-t border-ink-700/70 bg-ink-900">
-      <div className="mx-auto w-full max-w-[1200px] px-5 py-16 sm:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
+      <div className="mx-auto w-full max-w-[1200px] px-5 py-14 sm:px-8">
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <LoomPayLogo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-mist-500">
-              Open-source payment orchestration with a double-entry ledger, built for teams
-              that move real money.
+              {SITE.tagline}
             </p>
-            <div className="mt-5 flex items-center gap-2">
-              {COMPLIANCES.slice(0, 3).map((c) => (
-                <span
-                  key={c.label}
-                  className="rounded-lg border border-ink-700 bg-ink-850 px-2.5 py-1 text-2xs font-medium text-mist-500"
-                >
-                  {c.label}
-                </span>
-              ))}
-            </div>
           </div>
-          {columns.map((col) => (
-            <div key={col.title}>
-              <p className="text-xs font-semibold uppercase tracking-wider text-mist-300">
-                {col.title}
-              </p>
-              <ul className="mt-4 space-y-2.5">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-mist-500 transition-colors hover:text-brand-500"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <nav className="flex flex-wrap gap-x-7 gap-y-3">
+            {FOOTER_LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noreferrer' : undefined}
+                className="inline-flex items-center gap-1 text-sm text-mist-500 transition-colors hover:text-brand-500"
+              >
+                {link.label}
+                {link.external && <ExternalIcon className="h-3 w-3" />}
+              </a>
+            ))}
+          </nav>
         </div>
 
-        <div className="mt-14 grid gap-6 border-t border-ink-700/70 pt-8 sm:grid-cols-[1fr_auto] sm:items-center">
-          <div className="flex flex-wrap items-center gap-5 text-xs text-mist-500">
-            <span>© {new Date().getFullYear()} LoomPay. All rights reserved.</span>
-            <a href="#top" className="transition-colors hover:text-brand-500">
-              Privacy Policy
-            </a>
-            <a href="#top" className="transition-colors hover:text-brand-500">
-              Terms of Use
-            </a>
-          </div>
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-ink-700/70 pt-6 sm:flex-row sm:items-center">
+          <p className="text-xs text-mist-500">© 2026 LoomPay</p>
           <div className="flex items-center gap-2 text-xs text-mist-500">
             <span className="h-1.5 w-1.5 rounded-full bg-mint-400" />
-            All systems operational
+            Built with Spring Boot, PostgreSQL, and Redis
           </div>
         </div>
       </div>
