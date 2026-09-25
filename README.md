@@ -1,12 +1,11 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiramaab/loompay/main/frontend/public/vite.svg" alt="LoomPay-Logo" width="90px" />
+  <a href="https://loompay.abhiram.tech">
+    <img src="./assets/loompay-logo-dark.svg#gh-dark-mode-only" alt="LoomPay" width="300" />
+    <img src="./assets/loompay-logo-light.svg#gh-light-mode-only" alt="LoomPay" width="300" />
+  </a>
 </p>
 
-<h1 align="center">L O O M P A Y</h1>
-
-<p align="center">
-  <strong>Distributed & Composable Payment Orchestration Engine</strong>
-</p>
+<h1 align="center">Distributed & Composable Payment Orchestration Engine</h1>
 
 <p align="center">
   High-throughput payment gateway orchestrator built with Java 21, Spring Boot 3, Redis, and PostgreSQL.<br/>

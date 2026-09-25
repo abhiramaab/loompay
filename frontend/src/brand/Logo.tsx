@@ -7,8 +7,8 @@ interface MarkProps {
   className?: string
   animated?: boolean
   /**
-   * Render the rounded blue tile behind the mark. When false the needle and
-   * thread are drawn directly on a transparent background.
+   * Render a rounded tile behind the mark. When false the kite is drawn
+   * directly on a transparent background.
    */
   tile?: boolean
   /** Force a colour. Defaults to the brand gradient. */
@@ -16,12 +16,10 @@ interface MarkProps {
 }
 
 /**
- * LoomPay monogram: a needle with a thread running through its eye.
+ * LoomPay mark: a kite with a trailing tail and string.
  *
- * The needle is drawn as an outlined, tapered form so the eye is a genuine
- * opening — the mark stays transparent instead of sitting on a filled tile.
- * The thread passes through the eye and sweeps down into the foot of an "L",
- * so the mark reads as both a weaving tool and the initial.
+ * A kite (patang) is the motif — kept geometric and minimal so it stays sharp
+ * at small sizes and reads on a transparent background.
  */
 export function LoomPayMark({
   size = 36,
@@ -31,12 +29,14 @@ export function LoomPayMark({
   tone = 'brand',
 }: MarkProps) {
   const uid = useId().replace(/:/g, '')
-  const threadGrad = `lp-thread-${uid}`
-  const needleGrad = `lp-needle-${uid}`
+  const fillGrad = `lp-kite-${uid}`
+  const tailGrad = `lp-tail-${uid}`
 
   const isCurrent = tone === 'current'
-  const needleStroke = tile ? '#FFFFFF' : isCurrent ? 'currentColor' : `url(#${needleGrad})`
-  const threadStroke = tile ? 'rgba(255,255,255,0.9)' : isCurrent ? 'currentColor' : `url(#${threadGrad})`
+  const bodyFill = tile ? '#FFFFFF' : isCurrent ? 'currentColor' : `url(#${fillGrad})`
+  const tailStroke = tile ? 'rgba(255,255,255,0.92)' : isCurrent ? 'currentColor' : `url(#${tailGrad})`
+  const spineStroke = tile ? 'rgba(10,132,255,0.55)' : 'rgba(255,255,255,0.5)'
+  const stringStroke = tile ? 'rgba(255,255,255,0.55)' : isCurrent ? 'currentColor' : '#0A84FF'
 
   const draw = (delay: number, duration = 0.7) => ({
     initial: animated ? { pathLength: 0, opacity: 0 } : false,
@@ -56,70 +56,83 @@ export function LoomPayMark({
       aria-label="LoomPay"
     >
       <defs>
-        <linearGradient id={needleGrad} x1="22" y1="42" x2="46" y2="12" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#007AFF" />
-          <stop offset="1" stopColor="#3D9BFF" />
+        <linearGradient id={fillGrad} x1="20" y1="8" x2="46" y2="40" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#0A84FF" />
+          <stop offset="1" stopColor="#32ADE6" />
         </linearGradient>
-        <linearGradient id={threadGrad} x1="10" y1="12" x2="56" y2="54" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#32ADE6" />
-          <stop offset="1" stopColor="#5AC8FA" />
+        <linearGradient id={tailGrad} x1="30" y1="30" x2="46" y2="54" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#5AC8FA" />
+          <stop offset="1" stopColor="#32ADE6" />
         </linearGradient>
-        <mask id={`${needleGrad}-mask`}>
-          <rect x="0" y="0" width="64" height="64" fill="white" />
-          <ellipse
-            cx="23.2"
-            cy="40.4"
-            rx="1.25"
-            ry="2.5"
-            transform="rotate(-36.5 23.2 40.4)"
-            fill="black"
-          />
-        </mask>
       </defs>
 
       {tile && (
         <>
-          <rect x="0.5" y="0.5" width="63" height="63" rx="17" fill={`url(#${needleGrad})`} />
+          <rect x="0.5" y="0.5" width="63" height="63" rx="17" fill={`url(#${fillGrad})`} />
           <rect
             x="0.5"
             y="0.5"
             width="63"
             height="63"
             rx="17"
-            fill={`url(#${threadGrad})`}
+            fill={`url(#${tailGrad})`}
             fillOpacity="0.18"
           />
         </>
       )}
 
-      {/* Thread: passes through the eye, then sweeps down to form the L foot. */}
+      {/* Tail ribbon hanging from the bottom of the kite, with two bows. */}
       <motion.path
-        d="M9.5 10.5 C13 21 17.5 31 23.2 40.4 C26 46.5 31.5 50.5 38.5 51.6 C45.5 52.7 51.5 50.2 55 45.5"
-        stroke={threadStroke}
-        strokeWidth="3.4"
+        d="M32 46 C35 50.5 30 53 33 57.5"
+        stroke={tailStroke}
+        strokeWidth="2.8"
         strokeLinecap="round"
-        strokeLinejoin="round"
         fill="none"
-        {...draw(0.1, 0.95)}
+        {...draw(0.35, 0.6)}
       />
+      {[
+        'M27.4 49.6 C29.6 48.6 31.4 49.4 32.9 51.2',
+        'M36.6 50.4 C34.4 49.4 32.6 50.2 31.1 52',
+        'M27.6 54.6 C29.8 53.6 31.6 54.4 33.1 56.2',
+        'M36.8 55.4 C34.6 54.4 32.8 55.2 31.3 57',
+      ].map((d, i) => (
+        <motion.path
+          key={d}
+          d={d}
+          stroke={tailStroke}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          fill="none"
+          {...draw(0.5 + i * 0.05, 0.35)}
+        />
+      ))}
+
+      {/* String trailing from the right corner. */}
       <motion.path
-        d="M55 45.5 C56.8 43.8 57.8 42 58.2 40.2"
-        stroke={threadStroke}
-        strokeWidth="3.4"
+        d="M49 27 C54 31 54.5 38 50.5 43"
+        stroke={stringStroke}
+        strokeOpacity={tile ? 0.55 : 0.45}
+        strokeWidth="1.5"
         strokeLinecap="round"
         fill="none"
-        {...draw(1.0, 0.4)}
+        {...draw(0.6, 0.5)}
       />
 
-      {/* Needle drawn over the thread, tapering to a sharp point (upper-right). */}
+      {/* Kite body: a modern diamond with a centre spine. */}
       <motion.path
-        d="M20.6 45.8 L22.2 41.5 L42.6 13.7 L46.2 10.2 L44.9 15.1 L24.5 43.2 Z"
-        fill={needleStroke}
-        mask={`url(#${needleGrad}-mask)`}
-        initial={animated ? { opacity: 0, scale: 0.94 } : false}
+        d="M32 8 L49 27 L32 46 L15 27 Z"
+        fill={bodyFill}
+        initial={animated ? { opacity: 0, scale: 0.9 } : false}
         animate={animated ? { opacity: 1, scale: 1 } : undefined}
-        transition={{ duration: 0.45, delay: 0.35 }}
-        style={{ transformOrigin: '33px 28px' }}
+        transition={{ duration: 0.5, delay: 0.05, type: 'spring', stiffness: 220, damping: 18 }}
+        style={{ transformOrigin: '32px 27px' }}
+      />
+      <motion.path
+        d="M32 8 L32 46"
+        stroke={spineStroke}
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        {...draw(0.3, 0.5)}
       />
     </svg>
   )
@@ -144,7 +157,7 @@ export function LoomPayLogo({
     <div className={cn('flex items-center gap-2.5', className)}>
       <LoomPayMark
         size={size}
-        tile={isLight}
+        tile={false}
         tone={isLight ? 'current' : 'brand'}
         className={isLight ? 'text-white' : undefined}
       />
