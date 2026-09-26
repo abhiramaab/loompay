@@ -2,30 +2,76 @@ name: Keep Render Services Awake
 
 on:
   schedule:
-    # Runs every 5 minutes to keep Render services hot and awake
-    - cron: '*/5 * * * *'
-  workflow_dispatch: # Allows manual one-click trigger from GitHub Actions tab
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
+
     steps:
       - name: Ping Render Services
         env:
           SERVICE_URL: ${{ secrets.RENDER_SERVICE_URL || vars.RENDER_SERVICE_URL }}
         run: |
+          set -u
+
           if [ -z "$SERVICE_URL" ]; then
-            echo "⚠️ RENDER_SERVICE_URL is not configured yet."
-            echo "Go to your GitHub repo -> Settings -> Secrets and variables -> Actions -> Add repository secret/variable 'RENDER_SERVICE_URL' with your Render URL."
-            exit 0
+            echo "RENDER_SERVICE_URL is not configured."
+            exit 1
           fi
 
-          # Split by comma in case both frontend and backend URLs are provided
           IFS=',' read -ra URLS <<< "$SERVICE_URL"
+          failed=0
+
           for raw_url in "${URLS[@]}"; do
-            url=$(echo "$raw_url" | xargs)
+            url="$(echo "$raw_url" | xargs)"
+
+            if [[ ! "$url" =~ ^https?:// ]]; then
+              echo "::error::Invalid service URL: $url"
+              failed=1
+              continue
+            fi
+
             echo "Pinging $url ..."
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 45 "$url")
-            echo "[$url] -> HTTP Status: $HTTP_STATUS"
+
+            success=0
+            for attempt in 1 2 3; do
+              echo "Attempt $attempt/3"
+
+              set +e
+              HTTP_STATUS=$(
+                curl \
+                  --silent \
+                  --show-error \
+                  --output /dev/null \
+                  --write-out "%{http_code}" \
+                  --connect-timeout 15 \
+                  --max-time 120 \
+                  "$url"
+              )
+              CURL_EXIT=$?
+              set -e
+
+              echo "[$url] -> HTTP Status: ${HTTP_STATUS:-none}, curl exit: $CURL_EXIT"
+
+              if [ "$CURL_EXIT" -eq 0 ] &&
+                 [[ "$HTTP_STATUS" =~ ^[23][0-9][0-9]$ ]]; then
+                success=1
+                break
+              fi
+
+              sleep 10
+            done
+
+            if [ "$success" -ne 1 ]; then
+              echo "::error::Unable to reach $url after 3 attempts."
+              failed=1
+            fi
           done
-          echo "All active services pinged successfully!"
+
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+
+          echo "All active services responded successfully."
