@@ -38,4 +38,14 @@ public interface KeyValueStore {
      * @return true when the lock was removed
      */
     boolean compareAndDelete(String key, String expectedValue);
+
+    /**
+     * Sliding window rate limiter check and record.
+     *
+     * @param key the rate limiting bucket key
+     * @param maxRequests maximum allowed requests within the window
+     * @param window duration of the sliding window
+     * @return true if the request is allowed, false if limit exceeded
+     */
+    boolean isAllowedSlidingWindow(String key, long maxRequests, Duration window);
 }

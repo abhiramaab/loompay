@@ -18,17 +18,15 @@ public class RateLimiterService {
 
     public boolean isAllowed(String merchantId) {
         String key = "rate:merchant:" + merchantId;
+        boolean allowed = keyValueStore.isAllowedSlidingWindow(
+                key,
+                MAX_REQUESTS,
+                Duration.ofSeconds(WINDOW_SECONDS)
+        );
 
-        long currentCount = keyValueStore.increment(key);
-
-        if (currentCount == 1) {
-            keyValueStore.expire(key, Duration.ofSeconds(WINDOW_SECONDS));
+        if (!allowed) {
+            log.warn("Rate limit exceeded for merchant: {}", merchantId);
         }
-
-        if (currentCount > MAX_REQUESTS) {
-            log.warn("Rate limit exceeded for merchant; {}. Current count: {}", merchantId, currentCount);
-            return false;
-        }
-        return true;
+        return allowed;
     }
 }

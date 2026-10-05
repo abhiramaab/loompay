@@ -27,6 +27,7 @@ public class InMemoryKeyValueStore implements KeyValueStore {
 
     private final ConcurrentHashMap<String, Entry> store = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Long> counters = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, java.util.concurrent.ConcurrentLinkedQueue<Long>> slidingWindows = new ConcurrentHashMap<>();
 
     public InMemoryKeyValueStore() {
         log.warn("Using InMemoryKeyValueStore (local profile). Locks and rate limits are "
@@ -101,5 +102,23 @@ public class InMemoryKeyValueStore implements KeyValueStore {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean isAllowedSlidingWindow(String key, long maxRequests, Duration window) {
+        long now = System.currentTimeMillis();
+        long windowStart = now - window.toMillis();
+
+        var queue = slidingWindows.computeIfAbsent(key, k -> new java.util.concurrent.ConcurrentLinkedQueue<>());
+        synchronized (queue) {
+            while (!queue.isEmpty() && queue.peek() <= windowStart) {
+                queue.poll();
+            }
+            if (queue.size() >= maxRequests) {
+                return false;
+            }
+            queue.add(now);
+            return true;
+        }
     }
 }

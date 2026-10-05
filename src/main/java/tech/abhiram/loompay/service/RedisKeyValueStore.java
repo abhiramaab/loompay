@@ -50,4 +50,25 @@ public class RedisKeyValueStore implements KeyValueStore {
         }
         return false;
     }
+
+    @Override
+    public boolean isAllowedSlidingWindow(String key, long maxRequests, Duration window) {
+        long now = System.currentTimeMillis();
+        long windowStart = now - window.toMillis();
+
+        // 1. Remove old timestamps outside the window
+        redisTemplate.opsForZSet().removeRangeByScore(key, 0, windowStart);
+
+        // 2. Count current elements in window
+        Long count = redisTemplate.opsForZSet().zCard(key);
+        if (count != null && count >= maxRequests) {
+            return false;
+        }
+
+        // 3. Add current timestamp (score = timestamp, member = timestamp:nanos or unique value)
+        String member = now + ":" + System.nanoTime();
+        redisTemplate.opsForZSet().add(key, member, (double) now);
+        redisTemplate.expire(key, window);
+        return true;
+    }
 }
