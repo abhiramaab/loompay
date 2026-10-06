@@ -42,7 +42,7 @@
   - [3. Messaging: Transactional Outbox Pattern](#3-messaging-transactional-outbox-pattern)
   - [4. Sharding: Consistent Hashing 360° Ring Router](#4-sharding-consistent-hashing-360-ring-router)
   - [5. Integrity: Double-Entry Bookkeeping Ledger](#5-integrity-double-entry-bookkeeping-ledger)
-  - [6. Traffic: Token-Bucket Rate Limiter](#6-traffic-token-bucket-rate-limiter)
+  - [6. Traffic: Sliding-Window Rate Limiter](#6-traffic-sliding-window-rate-limiter)
   - [7. Recovery: Automated Reconciliation Engine](#7-recovery-automated-reconciliation-engine)
 - [Architecture & Transaction Lifecycle](#architecture--transaction-lifecycle)
 - [Quickstart (Local Docker Setup)](#quickstart-local-docker-setup)
@@ -97,10 +97,10 @@ LoomPay provides a composable, modular backend in Java 21 to solve these distrib
   * `CREDIT` to `Merchant_Account`
 * **Integrity Invariant**: Sum of all debits must equal sum of all credits across the entire ledger.
 
-### 6. Traffic: Token-Bucket Rate Limiter
-* **Mechanism**: Redis-backed fixed-window counter using `INCR` + `EXPIRE` registered via Spring MVC `HandlerInterceptor`.
-* **Enforcement**: Limits incoming requests per `X-Merchant-Id` (default: 5 requests per 10 seconds).
-* **HTTP 429 Response**: Excess traffic is rejected with `HTTP 429 Too Many Requests` alongside a standard `Retry-After: 10` header.
+### 6. Traffic: Sliding-Window Rate Limiter
+* **Mechanism**: Distributed sliding-window log using Redis Sorted Sets (`ZSET`) where scores represent timestamps and elements are purged via `removeRangeByScore` to prevent boundary burst anomalies.
+* **Enforcement**: Limits incoming requests per `X-Merchant-Id` (default: 5 requests per 10-second sliding window).
+* **HTTP 429 Response**: Excess traffic is dropped at the Spring `HandlerInterceptor` edge with `HTTP 429 Too Many Requests` and a standard `Retry-After: 10` header.
 
 ### 7. Recovery: Automated Reconciliation Engine
 * **Cron Worker**: A background scheduler (`@Scheduled(fixedDelay = 60000)`) searches for transactions stuck in `PROCESSING` status older than 5 minutes.
