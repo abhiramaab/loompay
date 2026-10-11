@@ -44,6 +44,7 @@
   - [5. Integrity: Double-Entry Bookkeeping Ledger](#5-integrity-double-entry-bookkeeping-ledger)
   - [6. Traffic: Sliding-Window Rate Limiter](#6-traffic-sliding-window-rate-limiter)
   - [7. Recovery: Automated Reconciliation Engine](#7-recovery-automated-reconciliation-engine)
+- [SOLID Principles & Object-Oriented Design](#solid-principles--object-oriented-design)
 - [Architecture & Transaction Lifecycle](#architecture--transaction-lifecycle)
 - [Quickstart (Local Docker Setup)](#quickstart-local-docker-setup)
 - [API Reference & Usage](#api-reference--usage)
@@ -105,6 +106,22 @@ LoomPay provides a composable, modular backend in Java 21 to solve these distrib
 ### 7. Recovery: Automated Reconciliation Engine
 * **Cron Worker**: A background scheduler (`@Scheduled(fixedDelay = 60000)`) searches for transactions stuck in `PROCESSING` status older than 5 minutes.
 * **Resolution**: Reconciles dangling states with upstream mock gateways and updates timed-out records to `FAILED`, releasing temporary holds.
+
+---
+
+## SOLID Principles & Object-Oriented Design
+
+LoomPay applies SOLID design principles to ensure resilience, testability, and clear separation of concerns across the payment pipeline:
+
+| Principle | Architectural Implementation in LoomPay |
+|---|---|
+| **Single Responsibility (SRP)** | Every core module has a single axis of change: `PaymentService` orchestrates transaction state transitions; `DistributedLockService` manages Redis mutex lifecycles and atomic Lua unlocking; `IdempotencyService` handles key verification and caching; `LedgerService` strictly enforces immutable double-entry journal balance invariants; `OutboxPublisherService` isolates asynchronous message delivery; `RateLimiterService` handles sliding-window log throttling. |
+| **Open/Closed (OCP)** | Storage mechanisms implement the `KeyValueStore` abstraction, enabling support for new caching backends (e.g., Hazelcast, In-Memory test stubs) without touching lock or rate-limiter logic. Virtual node partitioning in `ConsistentHashRouter` allows adding worker instances dynamically without modifying partition ring algorithms. The Transactional Outbox pattern allows adding new subscribers (Kafka, Webhooks) without changing checkout workflows. |
+| **Liskov Substitution (LSP)** | `RedisKeyValueStore` and `InMemoryKeyValueStore` both honor the `KeyValueStore` contract. For unit and integration tests (or Redis failover), `InMemoryKeyValueStore` substitutes the Redis backend without altering lock semantics, contract expectations, or client behavior. |
+| **Interface Segregation (ISP)** | Granular Spring Data repositories (`PaymentOrderRepository`, `PaymentAttemptRepository`, `LedgerEntryRepository`, `OutboxEventRepository`) prevent fat, omnibus database interfaces. Services depend only on the specific repository contract required for their domain. API contracts are isolated via dedicated DTOs (`CreatePaymentRequest`, `PaymentResponse`, `LedgerEntryRequest`). |
+| **Dependency Inversion (DIP)** | High-level orchestrators (`DistributedLockService`, `RateLimiterService`) depend upon abstract interfaces (`KeyValueStore`) rather than concrete drivers (`StringRedisTemplate`). Dependencies are injected via Spring Boot's IoC container using constructor injection, enabling hermetic Mockito testing. |
+
+*(For full LLD specifications, see [LoomPay Architecture Documentation](./docs/ARCHITECTURE.md#8-solid-principles--low-level-design-lld)).*
 
 ---
 

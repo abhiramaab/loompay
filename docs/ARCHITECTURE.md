@@ -121,3 +121,40 @@ Balances are never mutated via unchecked SQL increments (`UPDATE accounts SET ba
 * Runs every 60 seconds (`@Scheduled(fixedDelay = 60000)`).
 * Scans for transactions in `PROCESSING` state older than 5 minutes.
 * Queries payment service provider mock endpoints to reconcile downstream states, transitions expired orders to `FAILED`, and releases lingering balance reservations.
+
+---
+
+## 8. SOLID Principles & Low-Level Design (LLD)
+
+LoomPay is structured following strict object-oriented design and SOLID principles to ensure maintainability, testability, and fault isolation in a high-throughput financial system:
+
+### 1. Single Responsibility Principle (SRP)
+Each service and component in LoomPay has exactly one reason to change, isolating discrete concerns across the payment processing pipeline:
+* `PaymentService`: Orchestrates the lifecycle of transactions (`CREATED` → `AUTHORIZED` → `SETTLED`). It does not manage lock internals, ledger arithmetic, or outbox database rows directly.
+* `DistributedLockService`: Exclusively manages distributed lock acquisition and verified atomic release via Redis Lua scripting.
+* `IdempotencyService`: Exclusively verifies, fingerprints (SHA-256), and caches idempotency keys to prevent duplicate transaction authorization.
+* `LedgerService`: Solely maintains immutable double-entry bookkeeping ledgers and enforces debit/credit equality invariants.
+* `OutboxPublisherService`: Exclusively polls pending outbox events and manages reliable downstream dispatch and retry quarantine.
+* `RateLimiterService` / `RateLimitInterceptor`: Solely handles traffic shaping and rate-limiting enforcement via Redis Sorted Sets (ZSET).
+
+### 2. Open/Closed Principle (OCP)
+The system is open for extension without modifying existing, tested business logic:
+* **Pluggable Key-Value Backends**: The `KeyValueStore` interface allows adding new distributed caching/lock backends (e.g., Hazelcast, AWS ElastiCache, DynamoDB, or In-Memory test mocks) without modifying `DistributedLockService` or `RateLimiterService`.
+* **Dynamic Ring Topology**: `ConsistentHashRouter` supports dynamically adding/removing node workers and scaling virtual replicas on the 360° hash ring without modifying the clockwise partition algorithm.
+* **Event Dispatch Decoupling**: The Transactional Outbox Pattern enables attaching new event listeners (Kafka topics, analytical sinks, partner webhooks) without altering core payment checkout transactions.
+
+### 3. Liskov Substitution Principle (LSP)
+Subtypes can replace their base abstractions without altering program correctness:
+* `RedisKeyValueStore` and `InMemoryKeyValueStore` both implement the `KeyValueStore` contract (`get`, `set`, `setIfAbsentWithTtl`, `executeScript`).
+* In production, `RedisKeyValueStore` handles distributed Redis state; in hermetic unit test suites and offline fallback modes, `InMemoryKeyValueStore` substitutes it transparently without breaking lock semantics, atomicity expectations, or throwing unexpected unsupported-operation errors.
+
+### 4. Interface Segregation Principle (ISP)
+Clients are not forced to depend on broad or unused interfaces:
+* **Granular Domain Repositories**: Instead of a monolithic database repository, LoomPay segregates persistence into specialized Spring Data repositories (`PaymentOrderRepository`, `PaymentAttemptRepository`, `LedgerEntryRepository`, `OutboxEventRepository`). Services only inject the specific repositories required for their bounded context.
+* **Dedicated DTO Contracts**: Request/Response contracts (`CreatePaymentRequest`, `PaymentResponse`, `LedgerEntryRequest`) expose only fields relevant to each API boundary, preventing internal entity leakage.
+
+### 5. Dependency Inversion Principle (DIP)
+High-level modules do not depend on low-level concrete implementations; both depend on abstractions:
+* High-level domain services (`DistributedLockService`, `RateLimiterService`) depend on the abstract `KeyValueStore` interface rather than directly coupling to Spring's `StringRedisTemplate` or low-level Jedis/Lettuce drivers.
+* All dependencies are inverted and injected via Spring Boot's IoC container using constructor-based dependency injection, facilitating hermetic unit testing with Mockito.
+
