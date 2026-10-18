@@ -13,6 +13,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * <strong>Not</strong> a distributed store: it provides no cross-node
  * coordination. Bind only to the {@code local} Spring profile.
+ * </p>
+ *
+ * <p><strong>SOLID Principles Applied:</strong></p>
+ * <ul>
+ *   <li><strong>LSP (Liskov Substitution Principle):</strong> Functions as a direct behavioral substitute
+ *       for {@link RedisKeyValueStore} under the {@code local} profile and unit/integration tests without
+ *       altering contract expectations or client code.</li>
+ *   <li><strong>SRP (Single Responsibility Principle):</strong> Responsible solely for thread-safe in-memory
+ *       map operations and TTL expiration emulation.</li>
+ * </ul>
  */
 @Component
 @Profile("local")

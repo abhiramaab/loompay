@@ -6,6 +6,18 @@ import java.time.Duration;
  * Minimal key/value primitives required by the locking and rate-limiting layers.
  * The Redis implementation is the default; an in-memory implementation is used
  * for the {@code local} profile when Redis is not available.
+ *
+ * <p><strong>SOLID Principles Applied:</strong></p>
+ * <ul>
+ *   <li><strong>OCP (Open/Closed Principle):</strong> Defines an extensible storage abstraction. New caching
+ *       backends (e.g., Hazelcast, Memcached, In-Memory test stubs) can be introduced without modifying
+ *       locking or rate-limiting engines.</li>
+ *   <li><strong>DIP (Dependency Inversion Principle):</strong> Inverts dependencies so high-level orchestrators
+ *       ({@code DistributedLockService}, {@code RateLimiterService}) depend upon this abstraction rather than
+ *       concrete Redis driver templates.</li>
+ *   <li><strong>ISP (Interface Segregation Principle):</strong> Exposes only atomic primitives necessary for
+ *       distributed coordination, avoiding fat generic cache interfaces.</li>
+ * </ul>
  */
 public interface KeyValueStore {
 

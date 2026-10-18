@@ -4,7 +4,15 @@ import tech.abhiram.loompay.dto.CreatePaymentRequest;
 import tech.abhiram.loompay.dto.PaymentResponse;
 
 /**
- * Core interface for payment lifecycle operations (DIP & ISP).
+ * Core interface for payment lifecycle operations.
+ *
+ * <p><strong>SOLID Principles Applied:</strong></p>
+ * <ul>
+ *   <li><strong>ISP (Interface Segregation Principle):</strong> Client-focused service boundary isolating payment order creation
+ *       and inquiry from internal persistence, locking, or settlement mechanics.</li>
+ *   <li><strong>DIP (Dependency Inversion Principle):</strong> Presentation layers (controllers) depend on this contract rather
+ *       than concrete domain orchestrators.</li>
+ * </ul>
  */
 public interface PaymentService {
 

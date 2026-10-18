@@ -7,6 +7,18 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
+/**
+ * Production Redis-backed implementation of {@link KeyValueStore}.
+ *
+ * <p><strong>SOLID Principles Applied:</strong></p>
+ * <ul>
+ *   <li><strong>LSP (Liskov Substitution Principle):</strong> Strictly satisfies the {@link KeyValueStore} contract,
+ *       allowing transparent substitution with {@link InMemoryKeyValueStore} in local execution or integration tests
+ *       without violating lock or rate-limit behavioral invariants.</li>
+ *   <li><strong>SRP (Single Responsibility Principle):</strong> Solely responsible for executing atomic key-value operations
+ *       and Lua scripts against Redis.</li>
+ * </ul>
+ */
 @Component
 @Profile("!local")
 @RequiredArgsConstructor

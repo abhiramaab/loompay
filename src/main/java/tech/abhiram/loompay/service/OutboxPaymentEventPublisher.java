@@ -12,7 +12,16 @@ import tech.abhiram.loompay.repository.OutboxEventRepository;
 import java.util.Map;
 
 /**
- * Transactional Outbox implementation of PaymentEventPublisher (SRP & OCP).
+ * Transactional Outbox implementation of {@link PaymentEventPublisher}.
+ *
+ * <p><strong>SOLID Principles Applied:</strong></p>
+ * <ul>
+ *   <li><strong>SRP (Single Responsibility Principle):</strong> Responsible solely for serializing payment domain events
+ *       into durable database outbox records within the active ACID transaction.</li>
+ *   <li><strong>LSP (Liskov Substitution Principle):</strong> Can substitute any messaging publisher conforming to {@link PaymentEventPublisher}
+ *       without changing domain workflow.</li>
+ *   <li><strong>DIP (Dependency Inversion Principle):</strong> Injects repository and serialization abstractions.</li>
+ * </ul>
  */
 @Service
 @RequiredArgsConstructor

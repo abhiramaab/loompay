@@ -10,6 +10,16 @@ import tech.abhiram.loompay.enums.Currency;
 import tech.abhiram.loompay.enums.EntryType;
 import tech.abhiram.loompay.repository.LedgerEntryRepository;
 
+/**
+ * Financial double-entry bookkeeping ledger service.
+ *
+ * <p><strong>SOLID Principles Applied:</strong></p>
+ * <ul>
+ *   <li><strong>SRP (Single Responsibility Principle):</strong> Solely responsible for maintaining financial balance invariants
+ *       and immutable audit trails (Debits == Credits), completely isolated from gateway network calls.</li>
+ *   <li><strong>DIP (Dependency Inversion Principle):</strong> Interacts strictly through the {@link LedgerEntryRepository} interface.</li>
+ * </ul>
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

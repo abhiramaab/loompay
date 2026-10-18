@@ -6,6 +6,16 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
+/**
+ * Sliding-window request rate limiter.
+ *
+ * <p><strong>SOLID Principles Applied:</strong></p>
+ * <ul>
+ *   <li><strong>SRP (Single Responsibility Principle):</strong> Focused strictly on measuring request frequencies
+ *       and enforcing sliding-window throttling policies per tenant/merchant.</li>
+ *   <li><strong>DIP (Dependency Inversion Principle):</strong> Relies on the {@link KeyValueStore} interface for state storage.</li>
+ * </ul>
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
