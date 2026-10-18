@@ -121,7 +121,7 @@ LoomPay applies SOLID design principles to ensure resilience, testability, and c
 | **Interface Segregation (ISP)** | Granular Spring Data repositories (`PaymentOrderRepository`, `PaymentAttemptRepository`, `LedgerEntryRepository`, `OutboxEventRepository`) prevent fat, omnibus database interfaces. Services depend only on the specific repository contract required for their domain. API contracts are isolated via dedicated DTOs (`CreatePaymentRequest`, `PaymentResponse`, `LedgerEntryRequest`). |
 | **Dependency Inversion (DIP)** | High-level orchestrators (`DistributedLockService`, `RateLimiterService`) depend upon abstract interfaces (`KeyValueStore`) rather than concrete drivers (`StringRedisTemplate`). Dependencies are injected via Spring Boot's IoC container using constructor injection, enabling hermetic Mockito testing. |
 
-*(For full LLD specifications, see [LoomPay Architecture Documentation](./docs/ARCHITECTURE.md#8-solid-principles--low-level-design-lld)).*
+*(For complete Low-Level Design (LLD) and class-by-class implementation mapping, see the [LoomPay SOLID Design Specification](./docs/SOLID_DESIGN.md) and [LoomPay Architecture Documentation](./docs/ARCHITECTURE.md#8-solid-principles--low-level-design-lld)).*
 
 ---
 
